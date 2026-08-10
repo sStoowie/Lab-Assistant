@@ -1,0 +1,99 @@
+const lab1Data = {
+  title: "Lab 1 - Explore and Interact with the AWS Management Console and AWS CLI",
+  region: "LabRegion (ดูจากด้านซ้ายของ lab)",
+  steps: [
+    { num: 1, task: "Start Lab", desc: "กด Start Lab ที่หน้า lab", errors: [] },
+    { num: 2, task: "Start Lab", desc: "กด Open Console เพื่อเปิด AWS Management Console", errors: [
+      { problem: "เจอหน้า 'You must first sign out'", cause: "Browser มี session ของ AWS account อื่นค้างอยู่", fix: "กด 'click here' เพื่อ logout → ปิด tab Sign In → กลับมาที่หน้า lab → กด Open Console ใหม่ | หรือใช้ Incognito window" },
+      { problem: "กด Start Lab แล้วไม่มีอะไรเกิดขึ้น", cause: "Pop-up blocker ของ browser บล็อก console window", fix: "เพิ่ม domain ของ lab ใน pop-up allow list หรือปิด pop-up blocker → refresh หน้า → กดใหม่" }
+    ]},
+    { num: 3, task: "Task 1.1", desc: "ที่ navigation bar มุมบนขวา กด Region selector แล้วเลือก Region ที่ต้องการ", errors: [
+      { problem: "เลือก Region แล้วเปิดหน้าเว็บอื่นแทน console", cause: "บาง Region อาจ redirect ไปหน้าอื่น", fix: "กด Cancel แล้วลองเลือก Region อื่น | หรือกด AWS logo มุมซ้ายบนเพื่อกลับ console home" }
+    ]},
+    { num: 4, task: "Task 1.1", desc: "กดไอคอนเฟือง (gear icon) ที่ menu bar เพื่อเปิด General Settings", errors: [] },
+    { num: 5, task: "Task 1.1", desc: "กด See all user settings → จะเห็นหน้า Unified Settings", errors: [] },
+    { num: 6, task: "Task 1.1", desc: "ในส่วน Localization and default Region กด Edit", errors: [] },
+    { num: 7, task: "Task 1.1", desc: "เลือก Default Region จาก dropdown แล้วกด Save settings", errors: [
+      { problem: "ไม่เห็น success message หลังกด Save", cause: "เลือก Region เดียวกับที่ใช้อยู่ตอนนี้ — ต้องเลือก Region ที่ต่างจากปัจจุบันถึงจะเห็น message", fix: "ลองเลือก Region อื่นที่ต่างจาก Region ปัจจุบัน แล้วกด Save settings ใหม่" }
+    ]},
+    { num: 8, task: "Task 1.1", desc: "กด Go to new default Region", errors: [] },
+    { num: 9, task: "Task 1.1", desc: "กด AWS logo มุมซ้ายบนเพื่อกลับ console home page", errors: [] },
+    { num: 10, task: "Task 1.1", desc: "ที่ Region selector มุมบนขวา เลือก Region ที่ตรงกับ LabRegion จากด้านซ้ายของ lab instructions", errors: [
+      { problem: "ทำข้อถัดไปแล้ว resource หายหรือหาไม่เจอ", cause: "Region ไม่ตรงกับ LabRegion — resource ที่สร้างจะอยู่ใน region ที่เลือกตอนนั้น", fix: "ตรวจว่า Region selector มุมบนขวาตรงกับ LabRegion จากด้านซ้ายของ lab ตลอดการทำ lab" }
+    ]},
+    { num: 11, task: "Task 1.2", desc: "ที่ Search box ใน navigation bar พิมพ์ cloud เพื่อค้นหา", errors: [] },
+    { num: 12, task: "Task 1.2", desc: "ดูผลการค้นหา — สามารถเลือก category ด้านซ้ายเพื่อ filter", errors: [] },
+    { num: 13, task: "Task 1.2", desc: "ในส่วน Services ชี้เมาส์ไปที่ AWS Cloud Map แล้วกด link", errors: [] },
+    { num: 14, task: "Task 1.2", desc: "กด AWS logo มุมซ้ายบนเพื่อกลับ console home page", errors: [] },
+    { num: 15, task: "Task 1.3", desc: "ที่ navigation bar กด Services menu icon (⋮⋮⋮) เพื่อเปิด full list of services", errors: [] },
+    { num: 16, task: "Task 1.3", desc: "จากเมนูด้านซ้าย เลือก All services หรือ Recently visited แล้วเลือก service ที่ต้องการ add เป็น favorite", errors: [] },
+    { num: 17, task: "Task 1.3", desc: "กดดาว (star) ทางซ้ายของชื่อ service เพื่อเพิ่มเป็น Favorite", errors: [] },
+    { num: 18, task: "Task 1.3", desc: "จากเมนูด้านซ้าย เลือก Favorites เพื่อดูรายการ favorite ที่เพิ่มไว้", errors: [] },
+    { num: 19, task: "Task 1.3", desc: "ลบ service จาก Favorites โดยกด deselect ดาว (star) ที่ชื่อ service", errors: [] },
+    { num: 20, task: "Task 1.4", desc: "กด Services menu icon (⋮⋮⋮) แล้วเลือก service ใดก็ได้เพื่อเปิด service console", errors: [] },
+    { num: 21, task: "Task 1.4", desc: "กด AWS logo มุมซ้ายบนเพื่อกลับ console home page", errors: [] },
+    { num: 22, task: "Task 1.5", desc: "กด + Add widgets เพื่อเพิ่ม widget", errors: [] },
+    { num: 23, task: "Task 1.5", desc: "ในหน้า Add widgets ลาก widget ที่ต้องการไปวางบน console page", errors: [] },
+    { num: 24, task: "Task 1.5", desc: "ลากลาก title bar ของ widget เพื่อย้ายตำแหน่ง", errors: [] },
+    { num: 25, task: "Task 1.5", desc: "ลากมุมขวาล่างของ Recently Visited widget เพื่อ resize", errors: [] },
+    { num: 26, task: "Task 1.5", desc: "ที่ Welcome to AWS widget กด ellipsis icon (สามจุด) มุมขวาบน → กด Remove widget", errors: [] },
+    { num: 27, task: "Task 2", desc: "ที่ navigation bar กด Services menu icon (⋮⋮⋮) → All Services → Storage → S3", errors: [
+      { problem: "หา S3 ไม่เจอในลิสต์", cause: "อาจหาใน category ผิด", fix: "S3 อยู่ในหมวด Storage | หรือพิมพ์ S3 ใน search bar ที่ด้านบนของ console จะเร็วกว่า" }
+    ]},
+    { num: 28, task: "Task 2", desc: "ในเมนูด้านซ้าย เลือก General purpose buckets", errors: [] },
+    { num: 29, task: "Task 2", desc: "กด Create bucket", errors: [] },
+    { num: 30, task: "Task 2", desc: "ในส่วน General configuration ใส่ Bucket name เป็น labbucket-NUMBER (แทน NUMBER ด้วยตัวเลข random เช่น labbucket-987987)", errors: [
+      { problem: "เจอ error 'Bucket name already exists' หรือ 'Bucket name is not available'", cause: "S3 bucket name ต้อง unique ทั่วโลก — ชื่อที่ใส่มีคนอื่นใช้แล้ว", fix: "เปลี่ยนตัวเลขหลัง labbucket- เป็นเลข random อื่น เช่น labbucket-123456 | ชื่อต้อง: ตัวเล็กทั้งหมด, ไม่มี space, ไม่มี underscore" },
+      { problem: "เจอ error 'Bucket name invalid'", cause: "ชื่อ bucket มี uppercase, space, underscore หรือ special characters", fix: "ใช้ lowercase + ตัวเลข + ขีดกลาง (-) เท่านั้น | ห้ามมี space, underscore, uppercase, จุดนำหน้า/ตามหลัง" },
+      { problem: "Region ไม่ตรงกับ LabRegion", cause: "Region selector ถูกเปลี่ยนระหว่างทำ Task 1", fix: "ตรวจ Region selector มุมบนขวาว่าตรงกับ LabRegion จากด้านซ้ายของ lab ก่อนกด Create" }
+    ]},
+    { num: 31, task: "Task 2", desc: "ปล่อย settings อื่นทั้งหมดเป็น default", errors: [] },
+    { num: 32, task: "Task 2", desc: "กด Create bucket ที่ด้านล่างสุดของหน้า", errors: [] },
+    { num: 33, task: "Task 3", desc: "ดาวน์โหลดรูป HappyFace.jpg จาก link ใน lab instructions (คลิกขวา → Save image as)", errors: [
+      { problem: "คลิกขวาแล้วไม่เห็น Save image หรือ save ได้เป็น format อื่น", cause: "แต่ละ browser มีวิธี save ต่างกัน", fix: "Chrome/Edge: คลิกขวา → Save image as | Firefox: คลิกขวา → Save Image As | ตั้งชื่อเป็น HappyFace.jpg" }
+    ]},
+    { num: 34, task: "Task 3", desc: "ใน Amazon S3 console กดชื่อ labbucket-xxxxx ที่สร้างไว้", errors: [] },
+    { num: 35, task: "Task 3", desc: "กด Upload", errors: [] },
+    { num: 36, task: "Task 3", desc: "กด Add files แล้วเลือก HappyFace.jpg ที่ดาวน์โหลดไว้", errors: [] },
+    { num: 37, task: "Task 3", desc: "กด Upload", errors: [
+      { problem: "Upload failed หรือ error", cause: "ไฟล์อาจใหญ่เกินไป หรือ permission ไม่พอ", fix: "ตรวจว่าไฟล์เป็น .jpg ขนาดปกติ | ตรวจว่า Region ถูกต้อง (ข้อ 10) | ลอง refresh หน้าแล้ว upload ใหม่" }
+    ]},
+    { num: 38, task: "Task 3", desc: "เห็นข้อความ Upload succeeded แล้วกด Close", errors: [] },
+    { num: 39, task: "Task 4.1", desc: "ค้นหา EC2 ใน search bar ของ console", errors: [] },
+    { num: 40, task: "Task 4.1", desc: "ที่เมนูด้านซ้าย เลือก Instances", errors: [] },
+    { num: 41, task: "Task 4.1", desc: "เลือก (ติ๊ก) Command Host instance", errors: [
+      { problem: "ไม่เห็น Command Host instance ในลิสต์", cause: "Lab provisioning ยังไม่เสร็จ หรือ Region ผิด", fix: "ตรวจ Region ว่าตรงกับ LabRegion | รอ 1-2 นาทีแล้ว refresh | ตรวจว่า instance state เป็น Running" }
+    ]},
+    { num: 42, task: "Task 4.1", desc: "กด Connect", errors: [] },
+    { num: 43, task: "Task 4.1", desc: "เลือก tab SSM Session Manager", errors: [] },
+    { num: 44, task: "Task 4.1", desc: "กด Connect เพื่อเปิด terminal", errors: [
+      { problem: "ปุ่ม Connect เป็นสีเทากดไม่ได้", cause: "Instance ยังไม่พร้อม หรือ SSM Agent ยังไม่ register", fix: "รอ 2-3 นาทีหลัง instance เป็น Running แล้วลอง refresh + กด Connect ใหม่ | ตรวจว่า instance state=Running + 2/2 checks" },
+      { problem: "Connect ได้แต่ terminal ว่างเปล่าหรือค้าง", cause: "Session ยังกำลังเชื่อมต่อ", fix: "รอ 10-15 วินาที terminal จะ ready | ถ้าค้างนานเกิน 30 วินาที ให้ปิด tab แล้วกด Connect ใหม่" }
+    ]},
+    { num: 45, task: "Task 4.2", desc: "พิมพ์คำสั่ง aws s3 ls แล้วกด Enter เพื่อดู list ของ buckets", errors: [
+      { problem: "เจอ error 'Unable to locate credentials'", cause: "IAM role ของ Command Host instance ไม่ถูกต้อง หรือ instance profile ไม่ได้ attach", fix: "ไม่ควรเจอ error นี้ใน lab — ถ้าเจอลอง: ปิด Session Manager → กลับมากด Connect ใหม่ | หรือ Stop Lab → Start Lab ใหม่" },
+      { problem: "เจอ error 'command not found: aws'", cause: "พิมพ์คำสั่งผิด หรือ AWS CLI ไม่ได้ถูก install", fix: "ตรวจว่าพิมพ์ aws (ตัวเล็ก) ถูกต้อง | Command Host ควรมี AWS CLI install ไว้แล้ว ถ้าไม่มีอาจ connect ผิด instance" }
+    ]},
+    { num: 46, task: "Task 4.2", desc: "เห็น list ของ buckets ที่สร้างไว้ (รวม labbucket-xxxxx)", errors: [] },
+    { num: 47, task: "Task 4.2", desc: "พิมพ์คำสั่ง aws s3 mb s3://labclibucket-NUMBER (แทน NUMBER ด้วยตัวเลข random) แล้วกด Enter", errors: [
+      { problem: "เจอ error 'BucketAlreadyExists'", cause: "ชื่อ bucket ซ้ำกับที่มีอยู่แล้ว", fix: "เปลี่ยนตัวเลขหลัง labclibucket- เป็นเลข random อื่น แล้ว run คำสั่งใหม่" },
+      { problem: "เจอ error 'InvalidBucketName'", cause: "ชื่อ bucket มี uppercase หรืออักษรไม่ valid", fix: "ชื่อต้อง: ตัวเล็กทั้งหมด + ตัวเลข + ขีดกลาง | ห้ามมี space, uppercase, underscore" },
+      { problem: "เจอ error 'Access Denied'", cause: "IAM permissions ของ Command Host ไม่เพียงพอ", fix: "ไม่ควรเจอใน lab — ลอง Stop Lab → Start Lab ใหม่" }
+    ]},
+    { num: 48, task: "Task 4.2", desc: "เห็นข้อความ make_bucket: labclibucket-xxxxx", errors: [] },
+    { num: 49, task: "Task 4.2", desc: "พิมพ์คำสั่ง aws s3 ls เพื่อตรวจว่าเห็น bucket ใหม่ในลิสต์", errors: [] },
+    { num: 50, task: "Task 4.2", desc: "พิมพ์คำสั่ง aws s3 cp /home/ssm-user/HappyFace.jpg s3://labclibucket-NUMBER แล้วกด Enter", errors: [
+      { problem: "เจอ error 'No such file or directory'", cause: "ไฟล์ HappyFace.jpg ไม่อยู่ที่ path /home/ssm-user/ หรือชื่อไฟล์ผิด", fix: "ลอง ls /home/ssm-user/ เพื่อดูว่ามีไฟล์อะไรอยู่ | ถ้าไม่เห็น HappyFace.jpg แสดงว่า lab ยังไม่ได้วางไฟล์ไว้ → ลอง Stop Lab → Start Lab ใหม่" },
+      { problem: "เจอ error 'NoSuchBucket'", cause: "ชื่อ bucket ในคำสั่งไม่ตรงกับที่สร้างไว้ (ข้อ 47)", fix: "ตรวจว่าชื่อ bucket ในคำสั่ง cp ตรงกับชื่อที่ใช้ตอน mb ทุกตัวอักษร (ลอง aws s3 ls ดูชื่อจริง)" },
+      { problem: "คำสั่งไม่ทำงาน / ไม่มี output", cause: "อาจพิมพ์คำสั่งไม่ครบ หรือ copy มาแล้วมี hidden characters", fix: "ลอง clear terminal แล้วพิมพ์คำสั่งใหม่ทีละตัว | หรือ copy คำสั่งจาก lab page โดยกดไอคอน copy" }
+    ]},
+    { num: 51, task: "Task 4.2", desc: "เห็นข้อความ upload: ... to s3://labclibucket-xxxxx/HappyFace.jpg", errors: [] },
+    { num: 52, task: "Task 4.2", desc: "พิมพ์คำสั่ง aws s3 ls s3://labclibucket-NUMBER เพื่อดู object ที่ upload ไป", errors: [
+      { problem: "ไม่เห็น object ในลิสต์ (output ว่าง)", cause: "Upload ข้อ 50 ไม่สำเร็จ หรือชื่อ bucket ผิด", fix: "ตรวจว่าข้อ 50 แสดง upload success | ตรวจชื่อ bucket ในคำสั่งว่าตรงกับที่สร้างจริง" }
+    ]},
+    { num: 53, task: "Task 4.2", desc: "เห็น HappyFace.jpg ในลิสต์ → lab สำเร็จ", errors: [] },
+    { num: 54, task: "End Lab", desc: "กลับไปที่ AWS Management Console", errors: [] },
+    { num: 55, task: "End Lab", desc: "ที่มุมบนขวา กด AWSLabsUser แล้วกด Sign out", errors: [] },
+    { num: 56, task: "End Lab", desc: "กด End Lab แล้ว confirm เพื่อจบ lab", errors: [] }
+  ]
+};

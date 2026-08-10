@@ -1,4 +1,35 @@
 const specsHTML = {
+  lab1: `
+    <div class="spec-block overview"><h3>สรุปภาพรวม Lab 1</h3>
+      <ol class="overview-list">
+        <li>สำรวจ <strong>AWS Management Console</strong> — ทำความรู้จัก UI, Region selector, Search, Favorites, Widgets</li>
+        <li>สร้าง <strong>S3 Bucket ผ่าน Console</strong> — ฝึกสร้าง resource ผ่าน GUI (เบื้องหลังคือ API call)</li>
+        <li><strong>Upload object</strong> เข้า S3 — ฝึก upload ไฟล์ผ่าน console</li>
+        <li>เชื่อมต่อ <strong>Command Host ผ่าน Session Manager</strong> — ฝึกใช้ SSM เข้า EC2 instance</li>
+        <li>สร้าง <strong>S3 Bucket ผ่าน AWS CLI</strong> — ฝึกใช้คำสั่ง aws s3 mb, ls, cp</li>
+        <li>สรุป: ทำสิ่งเดียวกัน (สร้าง bucket + upload) ได้ 2 วิธี: <em>Console</em> กับ <em>CLI</em></li>
+      </ol>
+    </div>
+    <div class="spec-block"><h3>S3 Bucket (Console)</h3><ul>
+      <li>Bucket name: <code>labbucket-NUMBER</code> (NUMBER = เลข random)</li>
+      <li>Region: ตรงกับ <strong>LabRegion</strong> จากด้านซ้าย</li>
+      <li>Settings อื่น: <strong>default ทั้งหมด</strong></li>
+    </ul></div>
+    <div class="spec-block"><h3>Upload Object (Console)</h3><ul>
+      <li>ดาวน์โหลด <strong>HappyFace.jpg</strong> จาก lab link</li>
+      <li>Upload เข้า bucket ที่สร้างไว้</li>
+    </ul></div>
+    <div class="spec-block"><h3>Session Manager → Command Host</h3><ul>
+      <li>EC2 → Instances → เลือก <strong>Command Host</strong></li>
+      <li>Connect → SSM Session Manager → Connect</li>
+    </ul></div>
+    <div class="spec-block"><h3>S3 Bucket (CLI)</h3><ul>
+      <li>List buckets: <code>aws s3 ls</code></li>
+      <li>สร้าง bucket: <code>aws s3 mb s3://labclibucket-NUMBER</code></li>
+      <li>Upload: <code>aws s3 cp /home/ssm-user/HappyFace.jpg s3://labclibucket-NUMBER</code></li>
+      <li>ตรวจ: <code>aws s3 ls s3://labclibucket-NUMBER</code></li>
+    </ul></div>
+  `,
   lab2: `
     <div class="spec-block overview"><h3>สรุปภาพรวม Lab 2</h3>
       <ol class="overview-list">

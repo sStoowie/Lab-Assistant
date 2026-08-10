@@ -1,6 +1,7 @@
 let currentLab = null;
 
 const labs = {
+  lab1: { data: () => lab1Data, title: 'Lab 1 — Console & CLI', desc: 'This lab provides you with a basic overview of the AWS Management Console and API. You create S3 buckets using both the console and AWS CLI.' },
   lab2: { data: () => lab2Data, title: 'Lab 2 — VPC Infrastructure', desc: 'This lab follows Compute Module, which focuses primarily on Amazon EC2, and Networking Part 1 Module, which focuses on Amazon VPCs, subnets, and routing.' },
   lab3: { data: () => lab3Data, title: 'Lab 3 — Database Layer', desc: 'In this lab, you create an Amazon RDS database, view the database metadata, create an Application Load Balancer, configure the target group, register an existing Amazon EC2 instance as a target with the target group and test the load balancer.' },
   lab4: { data: () => lab4Data, title: 'Lab 4 — High Availability', desc: 'This lab provides hands-on practice deploying redundant resources in a VPC such as NAT gateway, VPC routing, EC2 auto scaling groups, and Amazon Aurora DB clusters.' },
