@@ -120,4 +120,4 @@ web/
 
 ---
 
-*Built with ❤️ for AWS Training TA Team*
+
