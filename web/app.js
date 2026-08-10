@@ -6,7 +6,8 @@ const labs = {
   lab3: { data: () => lab3Data, title: 'Lab 3 — Database Layer', desc: 'In this lab, you create an Amazon RDS database, view the database metadata, create an Application Load Balancer, configure the target group, register an existing Amazon EC2 instance as a target with the target group and test the load balancer.' },
   lab4: { data: () => lab4Data, title: 'Lab 4 — High Availability', desc: 'This lab provides hands-on practice deploying redundant resources in a VPC such as NAT gateway, VPC routing, EC2 auto scaling groups, and Amazon Aurora DB clusters.' },
   lab5: { data: () => lab5Data, title: 'Lab 5 — Serverless Architecture', desc: 'In this lab, you use AWS managed services to build a serverless architecture using Amazon SNS, Amazon SQS, AWS Lambda, and Amazon S3.' },
-  lab6: { data: () => lab6Data, title: 'Lab 6 — CloudFront + S3', desc: 'This lab provides you with an overview of creating Amazon S3 buckets and adding them as an origin to Amazon CloudFront distributions.' }
+  lab6: { data: () => lab6Data, title: 'Lab 6 — CloudFront + S3', desc: 'This lab provides you with an overview of creating Amazon S3 buckets and adding them as an origin to Amazon CloudFront distributions.' },
+  lab7: { data: () => lab7Data, title: 'Lab 7 — Capstone: Multi-Tier', desc: 'This lab provides capstone experience for the Architecting on AWS course. Build a full multi-tier WordPress architecture.' }
 };
 
 document.addEventListener('DOMContentLoaded', () => {

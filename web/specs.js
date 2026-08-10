@@ -355,5 +355,74 @@ const specsHTML = {
       <li>Invalidation: clear cache เมื่อ update content ใน S3</li>
       <li>Block Public Access + OAC: objects เข้าได้เฉพาะผ่าน CloudFront เท่านั้น</li>
     </ul></div>
+  `,
+
+  lab7: `
+    <div class="spec-block overview"><h3>สรุปภาพรวม Lab 7 (Capstone)</h3>
+      <ol class="overview-list">
+        <li>Deploy <strong>VPC ด้วย CloudFormation</strong> — สร้าง network ทั้งหมด (VPC, Subnets, IGW, NAT, Route Tables, SG) ด้วย template อัตโนมัติ</li>
+        <li>สร้าง <strong>Aurora RDS Database</strong> — managed database สำหรับ WordPress (Multi-AZ, burstable, db.t3.medium)</li>
+        <li>สร้าง <strong>Amazon EFS</strong> — shared file system ที่ EC2 ทุกตัวใช้ร่วมกันได้ (เก็บ WordPress files)</li>
+        <li>สร้าง <strong>Application Load Balancer</strong> — กระจาย traffic ไปหา WordPress instances ใน private subnet</li>
+        <li>Deploy <strong>Launch Template ด้วย CloudFormation</strong> — template สำหรับ EC2 พร้อม user data (mount EFS + connect DB + install WordPress)</li>
+        <li>สร้าง <strong>Auto Scaling Group</strong> — launch 2 instances ขั้นต่ำ scale ได้ถึง 4, self-healing</li>
+        <li>ทดสอบ — เปิด ALB DNS + /wp-login.php → login WordPress ด้วย wpadmin / LabPassword</li>
+      </ol>
+    </div>
+    <div class="spec-block"><h3>Task 1: CloudFormation VPC Stack</h3><ul>
+      <li>Template URL: <strong>Task1TemplateUrl</strong> (copy จากด้านซ้าย)</li>
+      <li>Stack name: <code>VPCStack</code></li>
+      <li>Parameters: <strong>default ทั้งหมด</strong></li>
+    </ul></div>
+    <div class="spec-block"><h3>Task 2: Aurora RDS</h3><ul>
+      <li>DB subnet group: Name=<code>AuroraSubnetGroup</code>, VPC=LabVPC, Subnets=10.0.4.0/24 + 10.0.5.0/24</li>
+      <li>Engine: <strong>Aurora (MySQL Compatible)</strong>, Template=Production</li>
+      <li>DB cluster identifier: <code>MyDBCluster</code></li>
+      <li>Master username: <code>admin</code>, Password: <strong>LabPassword</strong></li>
+      <li>Instance: <strong>Burstable db.t3.medium</strong>, Multi-AZ: Create Aurora Replica</li>
+      <li>VPC: LabVPC, Subnet group: aurorasubnetgroup, SG: <strong>RDSSecurityGroup</strong> (ลบ default!)</li>
+      <li>Enhanced monitoring: <strong>ออก!</strong></li>
+      <li>Initial DB name: <code>WPDatabase</code></li>
+      <li>Auto minor version + Deletion protection: <strong>ออก!</strong></li>
+      <li>จดไว้: Writer endpoint, admin, WPDatabase</li>
+    </ul></div>
+    <div class="spec-block"><h3>Task 3: EFS</h3><ul>
+      <li>Name: <code>myWPEFS</code></li>
+      <li>Automatic backups: <strong>ออก!</strong> | Encryption: <strong>ออก!</strong></li>
+      <li>Throughput: Bursting | Performance: General Purpose</li>
+      <li>VPC: LabVPC, Subnets: <strong>AppSubnet1 + AppSubnet2</strong></li>
+      <li>SG: <strong>EFSMountTargetSecurityGroup</strong> (ลบ default!)</li>
+      <li>จดไว้: File system ID (fs-xxxxxxx)</li>
+    </ul></div>
+    <div class="spec-block"><h3>Task 4: ALB + Target Group</h3><ul>
+      <li>Target group: Name=<code>myWPTargetGroup</code>, Type=Instances, VPC=LabVPC</li>
+      <li>Health check: path=<code>/wp-login.php</code>, Healthy=2, Unhealthy=10, Timeout=50, Interval=60</li>
+      <li>ALB: Name=<code>myWPAppALB</code>, VPC=LabVPC</li>
+      <li>Subnets: <strong>PublicSubnet1 + PublicSubnet2</strong></li>
+      <li>SG: <strong>AppInstanceSecurityGroup</strong> (ลบ default!)</li>
+      <li>Listener: HTTP:80 → myWPTargetGroup</li>
+      <li>จดไว้: ALB DNS name</li>
+    </ul></div>
+    <div class="spec-block"><h3>Task 5: CloudFormation Launch Template</h3><ul>
+      <li>Template URL: <strong>Task5TemplateUrl</strong> (copy จากด้านซ้าย)</li>
+      <li>Stack name: <code>WPLaunchConfigStack</code></li>
+      <li>DB Name: <code>WPDatabase</code> (ไม่ใช่ MyDBCluster!)</li>
+      <li>Database endpoint: <strong>Writer endpoint</strong> จาก Task 2</li>
+      <li>DB User: <code>admin</code> | DB Password: <strong>LabPassword</strong></li>
+      <li>WP admin: <code>wpadmin</code> | WP password: <strong>LabPassword</strong></li>
+      <li>ALBDnsName: DNS name จาก Task 4 <strong>(ห้ามใส่ http:// หรือ /)</strong></li>
+      <li>WPElasticFileSystemID: <strong>fs-xxxxxxx</strong> จาก Task 3</li>
+    </ul></div>
+    <div class="spec-block"><h3>Task 6: Auto Scaling Group</h3><ul>
+      <li>Name: <code>WP-ASG</code></li>
+      <li>Launch template: จาก Task 5</li>
+      <li>VPC: LabVPC, Subnets: <strong>AppSubnet1 + AppSubnet2</strong></li>
+      <li>Load balancer: Attach existing → <strong>myWPTargetGroup | HTTP</strong></li>
+      <li>ELB health checks: <strong>On</strong>, Grace period: 300</li>
+      <li>Group size: Desired=<strong>2</strong>, Min=<strong>2</strong>, Max=<strong>4</strong></li>
+      <li>Scaling: Target tracking (default)</li>
+      <li>Tag: Key=Name, Value=<code>WP-App</code></li>
+      <li>Test: ALB DNS + <code>/wp-login.php</code> → login: wpadmin / LabPassword</li>
+    </ul></div>
   `
 };

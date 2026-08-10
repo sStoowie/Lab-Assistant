@@ -44,7 +44,7 @@ const lab5Data = {
     { num: 20, task: "Task 2.2", desc: "กด Create queue", errors: [] },
     { num: 21, task: "Task 2.2", desc: "ในส่วน Details ตั้ง: Type=Standard, Name=mobile-queue", errors: [
       { problem: "เลือก Type เป็น FIFO แทน Standard", cause: "เหมือนข้อ 12 — FIFO ไม่ทำงานกับ SNS Standard topic", fix: "ต้องเลือก Standard — ลบ queue สร้างใหม่" },
-      { problem: "ชื่อ queue พิมพ์ผิด", cause: "Lambda trigger ข้อ 88 ต้อง match ชื่อ mobile-queue ตรงตัว", fix: "ชื่อต้องเป็น mobile-queue (ขีดกลาง ตัวเล็กทั้งหมด)" }
+      { problem: "ชื่อ queue พิมพ์ผิด", cause: "Lambda trigger ข้อ 92 ต้อง match ชื่อ mobile-queue ตรงตัว", fix: "ชื่อต้องเป็น mobile-queue (ขีดกลาง ตัวเล็กทั้งหมด)" }
     ]},
     { num: 22, task: "Task 2.2", desc: "ปล่อย Configuration parameters เป็นค่า default", errors: [] },
     { num: 23, task: "Task 2.2", desc: "กด Create queue จะเห็น success", errors: [] },
@@ -144,7 +144,7 @@ const lab5Data = {
     ]},
     { num: 73, task: "Task 4.2", desc: "Paste ค่า CreateThumbnailZIPLocation ลงในช่อง Amazon S3 link URL", errors: [
       { problem: "เจอ error 'The file could not be found' หรือ 'Access Denied'", cause: "Copy URL มาไม่ครบ หรือมี space ติดหน้า/หลัง", fix: "กลับไป copy CreateThumbnailZIPLocation จากด้านซ้ายของ lab ใหม่ (double-click เลือกทั้งหมด) → paste ใหม่ ตรวจว่าไม่มี space" },
-      { problem: "Copy URL ของ CreateMobileImage มาใส่แทน CreateThumbnail (สลับกัน)", cause: "Lab ด้านซ้ายมี 2 URLs — CreateThumbnailZIPLocation กับ CreateMobileImageZIPLocation ต้องใช้ให้ถูกตัว", fix: "ข้อนี้ต้องใช้ CreateThumbnailZIPLocation (สำหรับ CreateThumbnail function) | ข้อ 94 ถึงจะใช้ CreateMobileImageZIPLocation" }
+      { problem: "Copy URL ของ CreateMobileImage มาใส่แทน CreateThumbnail (สลับกัน)", cause: "Lab ด้านซ้ายมี 2 URLs — CreateThumbnailZIPLocation กับ CreateMobileImageZIPLocation ต้องใช้ให้ถูกตัว", fix: "ข้อนี้ต้องใช้ CreateThumbnailZIPLocation (สำหรับ CreateThumbnail function) | ข้อ 100 ถึงจะใช้ CreateMobileImageZIPLocation" }
     ]},
     { num: 74, task: "Task 4.2", desc: "กด Save (Update)", errors: [] },
     { num: 75, task: "Task 4.2", desc: "ดู code ที่ upload มา (ไม่ต้องแก้ไข)", errors: [] },
@@ -156,82 +156,109 @@ const lab5Data = {
     { num: 77, task: "Task 4.2", desc: "กด Save", errors: [] },
     { num: 78, task: "Task 4.2", desc: "เลือก tab Configuration", errors: [] },
     { num: 79, task: "Task 4.2", desc: "ที่เมนูด้านซ้าย เลือก General configuration → กด Edit", errors: [] },
-    { num: 80, task: "Task 4.2", desc: "ใส่ Description=Create a thumbnail-sized image แล้วกด Save", errors: [] },
-    { num: 81, task: "Task 4.2", desc: "กด Save", errors: [] },
-    { num: 82, task: "Task 4.3", desc: "ค้นหา Lambda ใน search bar", errors: [] },
-    { num: 83, task: "Task 4.3", desc: "กด Create function", errors: [] },
-    { num: 84, task: "Task 4.3", desc: "เลือก Author from scratch", errors: [] },
-    { num: 85, task: "Task 4.3", desc: "ตั้งค่า: Function name=CreateMobileImage, Runtime=Python 3.12, Expand Additional settings → เปิด Custom execution role → เลือก LabExecutionRole → Save", errors: [
-      { problem: "เหมือนข้อ 64 — ไม่เห็น role หรือ runtime ผิด", cause: "ไม่ได้ expand Additional settings / toggle Custom execution role / เลือก runtime ผิด", fix: "เหมือนข้อ 64: Expand → toggle Custom execution role → เลือก LabExecutionRole → Runtime=Python 3.12" }
+    { num: 80, task: "Task 4.2", desc: "ใส่ Description=Create a thumbnail-sized image", errors: [] },
+    { num: 81, task: "Task 4.2", desc: "ตั้ง Timeout=1 min 0 sec (หรือ 60 seconds) และ Memory=256 MB", errors: [
+      { problem: "Lambda function timeout ตอน process รูปใหญ่", cause: "Default timeout คือ 3 วินาที ซึ่งไม่พอสำหรับ image processing", fix: "ไปที่ Configuration → General configuration → Edit → ตั้ง Timeout=1 min 0 sec (60 seconds) | Memory=256 MB → Save" }
     ]},
-    { num: 86, task: "Task 4.3", desc: "กด Create function", errors: [] },
-    { num: 87, task: "Task 4.3", desc: "ถ้าเห็น Getting started pop-up กด Dismiss", errors: [] },
-    { num: 88, task: "Task 4.4", desc: "กด + Add trigger ตั้งค่า: Source=SQS, SQS Queue=mobile-queue, Batch size=1", errors: [
-      { problem: "ไม่เห็น mobile-queue ใน SQS dropdown", cause: "Queue ยังไม่สร้าง (ข้อ 21-23) หรือ region ผิด", fix: "ตรวจว่า mobile-queue สร้างสำเร็จแล้ว | Region ไม่ได้เปลี่ยน" },
-      { problem: "เลือก thumbnail-queue แทน mobile-queue (สลับกัน)", cause: "CreateMobileImage ต้อง trigger จาก mobile-queue ไม่ใช่ thumbnail-queue", fix: "ลบ trigger ที่ผิด: Lambda → Configuration → Triggers → เลือก trigger → Delete → แล้ว Add trigger ใหม่เลือก mobile-queue" },
-      { problem: "เจอ error 'An event source mapping with SQS arn already exists'", cause: "SQS queue หนึ่งตัวผูกกับ Lambda function ได้หลายตัว แต่ถ้า trigger เดียวกันซ้ำจะ error", fix: "แปลว่า trigger นี้มีอยู่แล้ว — ไม่ต้อง add ซ้ำ | ไปดูที่ Configuration → Triggers ว่ามี SQS trigger อยู่หรือยัง" }
-    ]},
-    { num: 89, task: "Task 4.4", desc: "Scroll ลงแล้วกด Add", errors: [] },
-    { num: 90, task: "Task 4.4", desc: "เลือก tab Code", errors: [] },
-    { num: 91, task: "Task 4.4", desc: "ดู settings", errors: [] },
-    { num: 92, task: "Task 4.4", desc: "Copy ค่า CreateMobileImageZIPLocation จากด้านซ้ายของ lab instructions", errors: [] },
-    { num: 93, task: "Task 4.4", desc: "กด Upload from → เลือก Amazon S3 location", errors: [
-      { problem: "เจอ error ตอน upload หรือ 'Access Denied'", cause: "Copy URL ของ CreateThumbnail มาแทน CreateMobileImage (สลับกัน)", fix: "ตรวจว่า copy CreateMobileImageZIPLocation จากด้านซ้ายของ lab (ไม่ใช่ CreateThumbnailZIPLocation!)" }
-    ]},
-    { num: 94, task: "Task 4.4", desc: "Paste ค่า CreateMobileImageZIPLocation ลงในช่อง URL", errors: [
-      { problem: "เจอ error ตอน upload code", cause: "Copy URL ไม่ครบ / มี space / ใช้ URL ผิดตัว (ใช้ CreateThumbnail แทน CreateMobileImage)", fix: "ตรวจว่า copy CreateMobileImageZIPLocation (ไม่ใช่ CreateThumbnailZIPLocation!) จากด้านซ้ายของ lab" }
-    ]},
-    { num: 95, task: "Task 4.4", desc: "กด Save (Update)", errors: [] },
-    { num: 96, task: "Task 4.4", desc: "ที่ Runtime settings กด Edit → ใส่ Handler=CreateMobileImage.handler → กด Save", errors: [
-      { problem: "Lambda error 'Unable to import module CreateMobileImage'", cause: "Handler ผิด — อาจใส่เป็น CreateThumbnail.handler (copy มาจาก function ก่อนหน้า)", fix: "Handler ต้องเป็น CreateMobileImage.handler (ไม่ใช่ CreateThumbnail.handler!)" },
-      { problem: "ใส่ Handler เป็น createmobileimage.handler (ตัวเล็กทั้งหมด)", cause: "เหมือนข้อ 76 — Handler name เป็น case sensitive ต้องตรงกับชื่อไฟล์ .py", fix: "Handler ต้องเป็น CreateMobileImage.handler (C, M, I ตัวใหญ่) — match กับ CreateMobileImage.py" }
-    ]},
-    { num: 97, task: "Task 4.4", desc: "กด Save", errors: [] },
-    { num: 98, task: "Task 4.4", desc: "เลือก tab Configuration → General configuration → Edit", errors: [] },
-    { num: 99, task: "Task 4.4", desc: "ใส่ Description=Create a mobile friendly image → กด Save", errors: [] },
-    { num: 100, task: "Task 4.4", desc: "ดู EnvironmentVariables ตั้ง: Key=bucket_name, Value=xxxxx-labbucket-xxxxx (ชื่อ bucket ของ lab)", errors: [
+    { num: 82, task: "Task 4.2", desc: "กด Save", errors: [] },
+    { num: 83, task: "Task 4.2", desc: "ที่เมนูด้านซ้าย เลือก Environment variables → กด Edit → กด Add environment variable", errors: [] },
+    { num: 84, task: "Task 4.2", desc: "ใส่ Key=bucket_name, Value=xxxxx-labbucket-xxxxx (ชื่อ bucket ของ lab) แล้วกด Save", errors: [
       { problem: "Lambda function error 'KeyError: bucket_name' ตอน trigger", cause: "ไม่ได้ตั้ง Environment variable หรือ Key/Value ผิด", fix: "Lambda → Configuration → Environment variables → Edit → Add: Key=bucket_name, Value=(ชื่อ bucket จริงจาก S3)" },
       { problem: "ใส่ Key เป็น bucket_Name หรือ Bucket_name (ตัวใหญ่-เล็กไม่ตรง)", cause: "Environment variable name เป็น case sensitive — code Lambda ใช้ os.environ['bucket_name'] ตัวเล็กทั้งหมด", fix: "Key ต้องเป็น bucket_name (ตัวเล็กทั้งหมด underscore คั่น)" },
       { problem: "ใส่ Value ผิด — copy ชื่อ bucket มาไม่ครบ หรือมี space ต่อท้าย", cause: "Bucket name ต้องตรงตัว 100% ถ้ามี space หรือตัวอักษรเกิน Lambda จะหา bucket ไม่เจอ", fix: "ไป S3 → copy ชื่อ bucket ที่มีคำว่า labbucket ให้ครบทั้ง string → paste ใน Value โดยตรวจว่าไม่มี space หน้า/หลัง" }
     ]},
-    { num: 101, task: "Task 4.4", desc: "กด Save", errors: [] },
-    { num: 102, task: "Task 5", desc: "Download รูปจาก lab (เลือก AWS.jpg, MonaLisa.jpg, หรือ HappyFace.jpg) ตั้งชื่อเป็น InputFile.jpg", errors: [
+    { num: 85, task: "Task 4.3", desc: "ค้นหา Lambda ใน search bar", errors: [] },
+    { num: 86, task: "Task 4.3", desc: "กด Create function", errors: [] },
+    { num: 87, task: "Task 4.3", desc: "เลือก Author from scratch", errors: [] },
+    { num: 88, task: "Task 4.3", desc: "ตั้งค่า: Function name=CreateMobileImage, Runtime=Python 3.12, Expand Additional settings → เปิด Custom execution role → เลือก LabExecutionRole → Save", errors: [
+      { problem: "เหมือนข้อ 64 — ไม่เห็น role หรือ runtime ผิด", cause: "ไม่ได้ expand Additional settings / toggle Custom execution role / เลือก runtime ผิด", fix: "เหมือนข้อ 64: Expand → toggle Custom execution role → เลือก LabExecutionRole → Runtime=Python 3.12" }
+    ]},
+    { num: 89, task: "Task 4.3", desc: "กด Create function", errors: [] },
+    { num: 90, task: "Task 4.3", desc: "ถ้าเห็น Getting started pop-up กด Dismiss", errors: [] },
+    { num: 91, task: "Task 4.4", desc: "กด + Add trigger ตั้งค่า: Source=SQS, SQS Queue=mobile-queue, Batch size=1", errors: [
+      { problem: "ไม่เห็น mobile-queue ใน SQS dropdown", cause: "Queue ยังไม่สร้าง (ข้อ 21-23) หรือ region ผิด", fix: "ตรวจว่า mobile-queue สร้างสำเร็จแล้ว | Region ไม่ได้เปลี่ยน" },
+      { problem: "เลือก thumbnail-queue แทน mobile-queue (สลับกัน)", cause: "CreateMobileImage ต้อง trigger จาก mobile-queue ไม่ใช่ thumbnail-queue", fix: "ลบ trigger ที่ผิด: Lambda → Configuration → Triggers → เลือก trigger → Delete → แล้ว Add trigger ใหม่เลือก mobile-queue" },
+      { problem: "เจอ error 'An event source mapping with SQS arn already exists'", cause: "SQS queue หนึ่งตัวผูกกับ Lambda function ได้หลายตัว แต่ถ้า trigger เดียวกันซ้ำจะ error", fix: "แปลว่า trigger นี้มีอยู่แล้ว — ไม่ต้อง add ซ้ำ | ไปดูที่ Configuration → Triggers ว่ามี SQS trigger อยู่หรือยัง" }
+    ]},
+    { num: 92, task: "Task 4.4", desc: "Scroll ลงแล้วกด Add", errors: [] },
+    { num: 93, task: "Task 4.4", desc: "เลือก tab Code", errors: [] },
+    { num: 94, task: "Task 4.4", desc: "ดู settings", errors: [] },
+    { num: 95, task: "Task 4.4", desc: "Copy ค่า CreateMobileImageZIPLocation จากด้านซ้ายของ lab instructions", errors: [] },
+    { num: 96, task: "Task 4.4", desc: "กด Upload from → เลือก Amazon S3 location", errors: [
+      { problem: "เจอ error ตอน upload หรือ 'Access Denied'", cause: "Copy URL ของ CreateThumbnail มาแทน CreateMobileImage (สลับกัน)", fix: "ตรวจว่า copy CreateMobileImageZIPLocation จากด้านซ้ายของ lab (ไม่ใช่ CreateThumbnailZIPLocation!)" }
+    ]},
+    { num: 97, task: "Task 4.4", desc: "Paste ค่า CreateMobileImageZIPLocation ลงในช่อง URL", errors: [
+      { problem: "เจอ error ตอน upload code", cause: "Copy URL ไม่ครบ / มี space / ใช้ URL ผิดตัว (ใช้ CreateThumbnail แทน CreateMobileImage)", fix: "ตรวจว่า copy CreateMobileImageZIPLocation (ไม่ใช่ CreateThumbnailZIPLocation!) จากด้านซ้ายของ lab" }
+    ]},
+    { num: 98, task: "Task 4.4", desc: "กด Save (Update)", errors: [] },
+    { num: 99, task: "Task 4.4", desc: "ที่ Runtime settings กด Edit → ใส่ Handler=CreateMobileImage.handler → กด Save", errors: [
+      { problem: "Lambda error 'Unable to import module CreateMobileImage'", cause: "Handler ผิด — อาจใส่เป็น CreateThumbnail.handler (copy มาจาก function ก่อนหน้า)", fix: "Handler ต้องเป็น CreateMobileImage.handler (ไม่ใช่ CreateThumbnail.handler!)" },
+      { problem: "ใส่ Handler เป็น createmobileimage.handler (ตัวเล็กทั้งหมด)", cause: "เหมือนข้อ 76 — Handler name เป็น case sensitive ต้องตรงกับชื่อไฟล์ .py", fix: "Handler ต้องเป็น CreateMobileImage.handler (C, M, I ตัวใหญ่) — match กับ CreateMobileImage.py" }
+    ]},
+    { num: 100, task: "Task 4.4", desc: "กด Save", errors: [] },
+    { num: 101, task: "Task 4.4", desc: "เลือก tab Configuration", errors: [] },
+    { num: 102, task: "Task 4.4", desc: "ที่เมนูด้านซ้าย เลือก General configuration → กด Edit", errors: [] },
+    { num: 103, task: "Task 4.4", desc: "ใส่ Description=Create a mobile friendly image", errors: [] },
+    { num: 104, task: "Task 4.4", desc: "ตั้ง Timeout=1 min 0 sec (หรือ 60 seconds) และ Memory=256 MB", errors: [
+      { problem: "Lambda function timeout ตอน process รูปใหญ่", cause: "Default timeout คือ 3 วินาที ซึ่งไม่พอสำหรับ image processing", fix: "ไปที่ Configuration → General configuration → Edit → ตั้ง Timeout=1 min 0 sec (60 seconds) | Memory=256 MB → Save" }
+    ]},
+    { num: 105, task: "Task 4.4", desc: "กด Save", errors: [] },
+    { num: 106, task: "Task 4.4", desc: "ที่เมนูด้านซ้าย เลือก Environment variables → กด Edit → กด Add environment variable", errors: [] },
+    { num: 107, task: "Task 4.4", desc: "ใส่ Key=bucket_name, Value=xxxxx-labbucket-xxxxx (ชื่อ bucket ของ lab) แล้วกด Save", errors: [
+      { problem: "Lambda function error 'KeyError: bucket_name' ตอน trigger", cause: "ไม่ได้ตั้ง Environment variable หรือ Key/Value ผิด", fix: "Lambda → Configuration → Environment variables → Edit → Add: Key=bucket_name, Value=(ชื่อ bucket จริงจาก S3)" },
+      { problem: "ใส่ Key เป็น bucket_Name หรือ Bucket_name (ตัวใหญ่-เล็กไม่ตรง)", cause: "Environment variable name เป็น case sensitive — code Lambda ใช้ os.environ['bucket_name'] ตัวเล็กทั้งหมด", fix: "Key ต้องเป็น bucket_name (ตัวเล็กทั้งหมด underscore คั่น)" },
+      { problem: "ใส่ Value ผิด — copy ชื่อ bucket มาไม่ครบ หรือมี space ต่อท้าย", cause: "Bucket name ต้องตรงตัว 100% ถ้ามี space หรือตัวอักษรเกิน Lambda จะหา bucket ไม่เจอ", fix: "ไป S3 → copy ชื่อ bucket ที่มีคำว่า labbucket ให้ครบทั้ง string → paste ใน Value โดยตรวจว่าไม่มี space หน้า/หลัง" }
+    ]},
+    { num: 108, task: "Task 5", desc: "Download รูปจาก lab (เลือก AWS.jpg, MonaLisa.jpg, หรือ HappyFace.jpg)", errors: [
       { problem: "Firefox save เป็น .jpeg แทน .jpg", cause: "Firefox อาจเปลี่ยน extension เป็น .jpeg อัตโนมัติ", fix: "Rename ไฟล์ให้เป็น .jpg ก่อน upload (ต้องเป็น .jpg ไม่ใช่ .jpeg เพราะ event filter ใช้ suffix .jpg)" },
       { problem: "Download ไฟล์มาแล้วชื่อเป็น InputFile.jpg.jpg (ซ้อน extension)", cause: "Windows ซ่อน extension อยู่ → พอ rename เพิ่ม .jpg ก็ซ้อนกัน", fix: "เปิด File Explorer → View → ติ๊ก File name extensions → จะเห็น extension จริง แล้ว rename ให้เหลือ .jpg เดียว" },
-      { problem: "ใช้ไฟล์ .png แทน .jpg", cause: "S3 event notification filter ตั้ง suffix=.jpg เท่านั้น — .png จะไม่ trigger event", fix: "ต้องใช้ไฟล์ .jpg เท่านั้น | Download รูปจาก lab ที่เป็น .jpg หรือ convert รูปเป็น .jpg ก่อน upload" }
+      { problem: "ใช้ไฟล์ .png แทน .jpg", cause: "S3 event notification filter ตั้ง suffix=.jpg เท่านั้น — .png จะไม่ trigger event", fix: "ต้องใช้ไฟล์ .jpg เท่านั้น | Download รูปจาก lab instruction ที่เป็น .jpg หรือ convert รูปเป็น .jpg ก่อน upload" }
     ]},
-    { num: 103, task: "Task 5", desc: "ค้นหา S3 ใน search bar", errors: [] },
-    { num: 104, task: "Task 5", desc: "กดชื่อ bucket xxxxx-labbucket-xxxxx", errors: [] },
-    { num: 105, task: "Task 5", desc: "กดเข้า folder ingest/", errors: [
+    { num: 109, task: "Task 5", desc: "ตรวจว่าชื่อไฟล์ที่ download มาลงท้ายด้วย .jpg (ไม่ใช่ .jpeg หรือ .png) ถ้าไม่ใช่ให้ rename", errors: [] },
+    { num: 110, task: "Task 5", desc: "ค้นหา S3 ใน search bar", errors: [] },
+    { num: 111, task: "Task 5", desc: "กดชื่อ bucket xxxxx-labbucket-xxxxx", errors: [] },
+    { num: 112, task: "Task 5", desc: "กดเข้า folder ingest/", errors: [
       { problem: "ไม่เห็น folder ingest/ ใน bucket", cause: "S3 'folder' จะเห็นก็ต่อเมื่อมี object ข้างในหรือถูกสร้างเป็น prefix — lab อาจยังไม่มี folder ingest/", fix: "ถ้าไม่เห็น folder ให้กด Create folder → ตั้งชื่อ ingest → Create | หรือถ้า upload ไฟล์ด้วย key prefix ingest/ มันจะสร้าง folder อัตโนมัติ" }
     ]},
-    { num: 106, task: "Task 5", desc: "กด Upload", errors: [] },
-    { num: 107, task: "Task 5", desc: "กด Add files แล้วเลือกรูปที่ download มา", errors: [
-      { problem: "Upload สำเร็จแต่ Lambda ไม่ trigger", cause: "ไฟล์ไม่ได้อยู่ใน folder ingest/ หรือไม่ใช่ .jpg", fix: "ต้อง upload ไปที่ folder ingest/ (ข้อ 105) และไฟล์ต้องลงท้าย .jpg (ไม่ใช่ .jpeg, .png)" },
+    { num: 113, task: "Task 5", desc: "กด Upload", errors: [] },
+    { num: 114, task: "Task 5", desc: "กด Add files", errors: [] },
+    { num: 115, task: "Task 5", desc: "เลือกรูปที่ download มา (.jpg)", errors: [
+      { problem: "Upload สำเร็จแต่ Lambda ไม่ trigger", cause: "ไฟล์ไม่ได้อยู่ใน folder ingest/ หรือไม่ใช่ .jpg", fix: "ต้อง upload ไปที่ folder ingest/ (ข้อ 112) และไฟล์ต้องลงท้าย .jpg (ไม่ใช่ .jpeg, .png)" },
       { problem: "Upload ไฟล์ชื่อ HappyFace.JPG (ตัวใหญ่) แทน .jpg (ตัวเล็ก)", cause: "S3 event notification suffix filter เป็น case sensitive — .JPG ≠ .jpg", fix: "Rename ไฟล์ให้เป็น .jpg (ตัวเล็ก) ก่อน upload | หรือ download ไฟล์ใหม่ save เป็น .jpg" },
       { problem: "Upload สำเร็จแต่ Lambda error ตอน process (ดู CloudWatch Logs เห็น error)", cause: "อาจเป็นไฟล์ที่ไม่ใช่ JPEG จริง (rename จาก .png เป็น .jpg) หรือไฟล์เสีย", fix: "ใช้ไฟล์รูปจริงที่เป็น JPEG format (ไม่ใช่แค่เปลี่ยน extension) | Download รูปจาก lab instruction ใหม่" }
     ]},
-    { num: 108, task: "Task 5", desc: "Scroll ลงแล้วกด Upload", errors: [] },
-    { num: 109, task: "Task 5", desc: "จะเห็นข้อความ Upload succeeded", errors: [
-      { problem: "Upload สำเร็จแต่ Lambda ไม่ trigger (ไม่มี output ใน S3 output folders)", cause: "หลายสาเหตุ: event notification ผิด / SNS policy ผิด / SQS subscription ผิด / Lambda trigger ผิด queue", fix: "เช็คตามลำดับ:\n1. Upload อยู่ใน folder ingest/? (ข้อ 105)\n2. ไฟล์ลงท้าย .jpg? (ข้อ 102)\n3. Event notification ตั้ง prefix=ingest/ + suffix=.jpg? (ข้อ 57)\n4. SNS access policy ถูกต้อง? (ข้อ 48-51)\n5. SQS subscribe กับ topic? (ข้อ 17, 26)\n6. Lambda trigger เป็น SQS ถูก queue? (ข้อ 67, 88)" },
+    { num: 116, task: "Task 5", desc: "Scroll ลงแล้วกด Upload", errors: [] },
+    { num: 117, task: "Task 5", desc: "จะเห็นข้อความ Upload succeeded", errors: [
+      { problem: "Upload สำเร็จแต่ Lambda ไม่ trigger (ไม่มี output ใน S3 output folders)", cause: "หลายสาเหตุ: event notification ผิด / SNS policy ผิด / SQS subscription ผิด / Lambda trigger ผิด queue", fix: "เช็คตามลำดับ:\n1. Upload อยู่ใน folder ingest/? (ข้อ 112)\n2. ไฟล์ลงท้าย .jpg? (ข้อ 109)\n3. Event notification ตั้ง prefix=ingest/ + suffix=.jpg? (ข้อ 57)\n4. SNS access policy ถูกต้อง? (ข้อ 48-51)\n5. SQS subscribe กับ topic? (ข้อ 17, 26)\n6. Lambda trigger เป็น SQS ถูก queue? (ข้อ 67, 91)" },
       { problem: "เช็คทุกอย่างแล้ว ถูกหมด แต่ Lambda ยังไม่ trigger", cause: "SNS topic type เป็น FIFO (ข้อ 7) ซึ่ง incompatible กับ S3 event notification — S3 ส่ง notification ไป SNS ไม่ได้", fix: "ตรวจ SNS topic type: ไปที่ SNS → Topics → ดูว่า Type เป็น Standard ไม่ใช่ FIFO | ถ้าเป็น FIFO ต้อง delete topic แล้วสร้างใหม่เป็น Standard แล้ว re-subscribe queues ทั้ง 2 ตัว (ข้อ 17, 26)" }
     ]},
-    { num: 110, task: "Task 6.1", desc: "ค้นหา Lambda ใน search bar", errors: [] },
-    { num: 111, task: "Task 6.1", desc: "เลือก function ใดก็ได้ (CreateThumbnail หรือ CreateMobileImage)", errors: [] },
-    { num: 112, task: "Task 6.1", desc: "เลือก tab Monitor", errors: [] },
-    { num: 113, task: "Task 6.1", desc: "กด View CloudWatch logs", errors: [] },
-    { num: 114, task: "Task 6.1", desc: "เลือก Log stream ล่าสุด (เรียงตาม Last event time)", errors: [
-      { problem: "ไม่เห็น Log stream ใดๆ", cause: "Lambda ไม่ได้ถูก invoke เลย — event notification chain มีปัญหาตรงไหนสักจุด", fix: "ย้อนเช็คตาม flow: S3 event → SNS → SQS → Lambda trigger | ดูข้อ 109 สำหรับ checklist" }
+    { num: 118, task: "Task 6", desc: "ค้นหา Lambda ใน search bar", errors: [] },
+    { num: 119, task: "Task 6", desc: "กดเลือก function CreateThumbnail", errors: [] },
+    { num: 120, task: "Task 6", desc: "เลือก tab Monitor", errors: [] },
+    { num: 121, task: "Task 6", desc: "กด View CloudWatch logs", errors: [] },
+    { num: 122, task: "Task 6", desc: "เลือก Log stream ล่าสุด (เรียงตาม Last event time)", errors: [
+      { problem: "ไม่เห็น Log stream ใดๆ", cause: "Lambda ไม่ได้ถูก invoke เลย — event notification chain มีปัญหาตรงไหนสักจุด", fix: "ย้อนเช็คตาม flow: S3 event → SNS → SQS → Lambda trigger | ดูข้อ 117 สำหรับ checklist" }
     ]},
-    { num: 115, task: "Task 6.1", desc: "Expand log messages ดูรายละเอียด (RequestId, Duration, Memory)", errors: [] },
-    { num: 116, task: "Task 6.2", desc: "ค้นหา S3 ใน search bar", errors: [] },
-    { num: 117, task: "Task 6.2", desc: "กดชื่อ bucket xxxxx-labbucket-xxxxx", errors: [] },
-    { num: 118, task: "Task 6.2", desc: "เข้าไปดูใน folder thumbnail/ และ mobile/ ตรวจว่ามีรูปที่ถูก resize แล้ว", errors: [
-      { problem: "ไม่เห็น folder thumbnail/ หรือ mobile/ หรือ folder ว่างเปล่า", cause: "Lambda function ไม่ได้ทำงาน หรือ error ระหว่าง execution", fix: "ไปดู CloudWatch Logs (ข้อ 113-115) ว่ามี error อะไร | Common issues:\n1. Handler ผิด (ข้อ 76, 96)\n2. Code upload ไม่ถูก (ข้อ 73, 94)\n3. Execution role ไม่มี S3 permission (ข้อ 64, 85)\n4. SQS trigger ไม่ถูก queue (ข้อ 67, 88)" },
-      { problem: "มี folder thumbnail/ แต่ไม่มี folder mobile/ (หรือกลับกัน)", cause: "Lambda function ตัวใดตัวหนึ่ง trigger ผิด queue — เช่น CreateMobileImage trigger จาก thumbnail-queue แทน mobile-queue (ข้อ 67, 88 สลับกัน)", fix: "ไปเช็ค Lambda → แต่ละ function → Configuration → Triggers:\n- CreateThumbnail ต้อง trigger จาก thumbnail-queue\n- CreateMobileImage ต้อง trigger จาก mobile-queue\nถ้าสลับกัน → ลบ trigger แล้ว add ใหม่ให้ถูกคู่" }
+    { num: 123, task: "Task 6", desc: "Expand log messages ดูรายละเอียด (RequestId, Duration, Memory) ของ CreateThumbnail", errors: [] },
+    { num: 124, task: "Task 6", desc: "กลับไปหน้า Lambda Functions แล้วกดเลือก function CreateMobileImage", errors: [] },
+    { num: 125, task: "Task 6", desc: "เลือก tab Monitor → กด View CloudWatch logs → เลือก Log stream ล่าสุด", errors: [
+      { problem: "CreateMobileImage ไม่มี Log stream แต่ CreateThumbnail มี", cause: "CreateMobileImage ไม่ได้ถูก trigger — อาจผูก trigger ผิด queue หรือ mobile-queue ไม่ได้ subscribe กับ SNS", fix: "เช็ค: Lambda CreateMobileImage → Configuration → Triggers → ต้องเห็น SQS mobile-queue | เช็ค SQS mobile-queue → SNS subscriptions → ต้องเห็น resize-image-topic" }
     ]},
-    { num: 119, task: "End Lab", desc: "กลับไป AWS Management Console", errors: [] },
-    { num: 120, task: "End Lab", desc: "ที่มุมบนขวา กด AWSLabsUser แล้วกด Sign out", errors: [] },
-    { num: 121, task: "End Lab", desc: "กด End Lab แล้ว confirm เพื่อจบ lab", errors: [] }
+    { num: 126, task: "Task 6", desc: "Expand log messages ดูรายละเอียดของ CreateMobileImage", errors: [] },
+    { num: 127, task: "Task 6", desc: "ค้นหา S3 ใน search bar", errors: [] },
+    { num: 128, task: "Task 6", desc: "กดชื่อ bucket xxxxx-labbucket-xxxxx", errors: [] },
+    { num: 129, task: "Task 6", desc: "กดเข้า folder thumbnail/ ตรวจว่ามีรูปที่ถูก resize แล้ว", errors: [
+      { problem: "ไม่เห็น folder thumbnail/ หรือ folder ว่างเปล่า", cause: "CreateThumbnail Lambda ไม่ได้ทำงาน หรือ error ระหว่าง execution", fix: "ไปดู CloudWatch Logs (ข้อ 121-123) ว่ามี error อะไร | Common issues:\n1. Handler ผิด (ข้อ 76)\n2. Code upload ไม่ถูก (ข้อ 73)\n3. Execution role ไม่มี S3 permission (ข้อ 64)\n4. SQS trigger ไม่ถูก queue (ข้อ 67)" }
+    ]},
+    { num: 130, task: "Task 6", desc: "กลับไปหน้า bucket แล้วกดเข้า folder mobile/ ตรวจว่ามีรูปที่ถูก resize แล้ว", errors: [
+      { problem: "ไม่เห็น folder mobile/ หรือ folder ว่างเปล่า", cause: "CreateMobileImage Lambda ไม่ได้ทำงาน หรือ error ระหว่าง execution", fix: "ไปดู CloudWatch Logs ของ CreateMobileImage (ข้อ 124-126) ว่ามี error อะไร | Common issues:\n1. Handler ผิด (ข้อ 99)\n2. Code upload ไม่ถูก (ข้อ 97)\n3. SQS trigger ผิด queue (ข้อ 91)\n4. Environment variable bucket_name ผิด (ข้อ 107)" },
+      { problem: "มี folder thumbnail/ แต่ไม่มี folder mobile/ (หรือกลับกัน)", cause: "Lambda function ตัวใดตัวหนึ่ง trigger ผิด queue — เช่น CreateMobileImage trigger จาก thumbnail-queue แทน mobile-queue (ข้อ 67, 91 สลับกัน)", fix: "ไปเช็ค Lambda → แต่ละ function → Configuration → Triggers:\n- CreateThumbnail ต้อง trigger จาก thumbnail-queue\n- CreateMobileImage ต้อง trigger จาก mobile-queue\nถ้าสลับกัน → ลบ trigger แล้ว add ใหม่ให้ถูกคู่" }
+    ]},
+    { num: 131, task: "Task 6", desc: "เปรียบเทียบขนาดรูปใน folder thumbnail/ กับ mobile/ กับรูปต้นฉบับใน ingest/", errors: [] },
+    { num: 132, task: "Task 6", desc: "ตรวจว่า thumbnail มีขนาดเล็กกว่า mobile และ mobile เล็กกว่าต้นฉบับ", errors: [] },
+    { num: 133, task: "End Lab", desc: "กลับไป AWS Management Console", errors: [] },
+    { num: 134, task: "End Lab", desc: "ปิด tab ที่เปิดค้างอยู่ (CloudWatch, Lambda ฯลฯ)", errors: [] },
+    { num: 135, task: "End Lab", desc: "ที่มุมบนขวา กด AWSLabsUser แล้วกด Sign out", errors: [] },
+    { num: 136, task: "End Lab", desc: "กด End Lab แล้ว confirm เพื่อจบ lab", errors: [] }
   ]
 };
