@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Debug Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="app">
+        <!-- HOMEPAGE -->
+        <div id="homepage">
+            <div class="home-header">
+                <h1>Lab Debug Assistant</h1>
+                <p class="home-subtitle">AWS Training — TA Internal Tool</p>
+            </div>
+            <div class="home-grid" id="labGrid"></div>
+        </div>
+
+        <!-- LAB PAGE -->
+        <div id="labpage" class="hidden">
+            <header>
+                <div class="header-top">
+                    <button class="back-btn" onclick="goHome()">← Labs</button>
+                    <h1 id="labTitle"></h1>
+                    <span class="badge">TA Tool</span>
+                </div>
+                <p id="labDesc" class="lab-desc"></p>
+            </header>
+
+            <div class="spec-section">
+                <div class="spec-tabs">
+                    <button class="spec-tab active" data-tab="spec">Spec</button>
+                    <button class="spec-tab" data-tab="steps">Steps & Errors</button>
+                </div>
+                <div id="tab-spec" class="tab-content"></div>
+                <div id="tab-steps" class="tab-content hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="lab2-data.js"></script>
+    <script src="lab3-data.js"></script>
+    <script src="lab4-data.js"></script>
+    <script src="lab5-data.js"></script>
+    <script src="lab6-data.js"></script>
+    <script src="specs.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
