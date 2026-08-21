@@ -26,6 +26,7 @@ const lab6Data = {
     { num: 12, task: "Task 1.3", desc: "คลิกแท็บ Origins เพื่อดู origin ที่ตั้งค่าไว้", errors: [] },
     { num: 13, task: "Task 1.3", desc: "Copy ค่า Origin domain (Load Balancer DNS) จากคอลัมน์ Origin domain", errors: [] },
     { num: 14, task: "Task 1.3", desc: "วาง Load Balancer DNS ใน browser tab ใหม่ → จะเห็นหน้าเว็บเดียวกัน", errors: [
+      { problem: "วาง DNS แล้วเปิดไม่ได้ตั้งแต่ตอนแรก", cause: "browser เติม https:// ให้อัตโนมัติ แต่ Load Balancer ของ lab เปิดแค่ HTTP (port 80) ไม่มี certificate จึงเชื่อมต่อไม่ได้", fix: "พิมพ์ http:// นำหน้าเองให้ชัด เช่น http://ชื่อ-alb.region.elb.amazonaws.com (ไม่มีตัว s)\nถ้า browser ยังเด้งไป https ให้ลองเปิดใน Incognito หรือ browser อื่น | ใช้กับ CloudFront domain ในข้อ 9 ได้เหมือนกัน แต่ CloudFront รองรับ https อยู่แล้ว" },
       { problem: "หน้าเว็บไม่แสดงเหมือนตอนข้อ 9 หรือ Instance ID ต่างกัน", cause: "Instance ID ต่าง = ปกติ (ALB round-robin ไปหลาย instance) | หน้าไม่แสดงเลย = ตอน copy DNS มา copy ผิดค่า", fix: "Instance ID ต่างจากข้อ 9 = ถูกต้อง (ALB route ไปคนละ instance) | ถ้า timeout ตรวจว่า copy Origin domain ถูกตัว" }
     ]},
     { num: 15, task: "Task 1.3", desc: "กลับมาที่ CloudFront console แล้วคลิกแท็บ Behaviors", errors: [] },
@@ -145,7 +146,9 @@ const lab6Data = {
     { num: 90, task: "Task 5.4", desc: "ในส่วน Cache key and origin requests เลือก Cache policy and origin request policy (recommended)", errors: [] },
     { num: 91, task: "Task 5.4", desc: "ในช่อง Cache policy เลือก CachingOptimized", errors: [] },
     { num: 92, task: "Task 5.4", desc: "ปล่อยค่าอื่นๆ เป็น default", errors: [] },
-    { num: 93, task: "Task 5.4", desc: "กด Create behavior → จะเห็น success", errors: [] },
+    { num: 93, task: "Task 5.4", desc: "กด Create behavior → จะเห็น success", errors: [
+      { problem: "ตั้ง behavior ผิด (Path pattern ผิด หรือเลือก origin ผิด) แล้วรูปไม่ขึ้นตอนทดสอบ", cause: "Path pattern ไม่ตรงกับ path จริงของไฟล์ หรือ Origin ชี้ไป Load Balancer แทน S3 origin ทำให้ CloudFront ไปดึงไฟล์จากที่ผิด", fix: "behavior แก้ย้อนหลังได้ ไม่ต้อง End Lab: CloudFront → distribution → tab Behaviors → ติ๊ก behavior ที่สร้างไว้ → กด Edit\nตรวจ 2 ค่า: Path pattern = CachedObjects/*.png (ข้อ 88) และ Origin = My Amazon S3 Origin (ข้อ 89) → Save\nbucket policy ก็แก้ย้อนหลังได้เหมือนกัน (ข้อ 61) — สองอย่างนี้ไม่ต้องเริ่ม lab ใหม่" }
+    ]},
     { num: 94, task: "Task 6", desc: "ค้นหา S3 ใน search bar", errors: [] },
     { num: 95, task: "Task 6", desc: "คลิกเลือก LabBucket", errors: [] },
     { num: 96, task: "Task 6", desc: "คลิกแท็บ Objects", errors: [] },
@@ -159,6 +162,7 @@ const lab6Data = {
     ]},
     { num: 101, task: "Task 7", desc: "วาง DNS ใน browser tab ใหม่", errors: [] },
     { num: 102, task: "Task 7", desc: "ต่อท้าย URL ด้วย /CachedObjects/logo.png แล้วกด Enter → จะเห็นรูปภาพ", errors: [
+      { problem: "เจอ AccessDenied ตอนเปิดผ่าน CloudFront (ทั้งที่ผ่าน CloudFront ควรเข้าได้)", cause: "Bucket policy ใส่ Resource ARN ไม่ครบ — ลืมต่อท้ายด้วย /* ทำให้ policy อนุญาตแค่ตัว bucket ไม่ครอบคลุม object ข้างใน CloudFront จึงอ่านไฟล์ไม่ได้", fix: "S3 → LabBucket → tab Permissions → Bucket policy → Edit → ดูค่า Resource ต้องลงท้ายด้วย /* เช่น arn:aws:s3:::ชื่อ-bucket/* (ข้อ 64)\nเช็คด้วยว่า CLOUDFRONT_DISTRIBUTION_ARN ถูกแทนด้วย ARN จริงแล้ว ไม่เหลือ placeholder ค้าง (ข้อ 65)\nแก้ policy แล้ว Save ได้เลย ไม่ต้อง End Lab | แก้แล้วยังไม่หายให้รอสักครู่หรือลอง invalidate cache" },
       { problem: "เจอ AccessDenied จาก CloudFront", cause: "Distribution ยังอยู่ระหว่าง deploy (ใช้เวลา 5-15 นาทีหลังสร้าง origin/behavior ใหม่)", fix: "รอ 5-15 นาทีแล้วลอง refresh — ตรวจ distribution status ที่ CloudFront console ว่าไม่ใช่ 'Deploying' | ถ้ารอนานแล้วยังไม่ได้ ตรวจ bucket policy (ขั้นตอนที่ 67-68)" },
       { problem: "เจอ 404 Not Found", cause: "Path ใน URL ผิด — ชื่อ folder หรือไฟล์ไม่ตรง", fix: "URL ต้องเป็น https://d1234abcd.cloudfront.net/CachedObjects/logo.png (ตัวพิมพ์ใหญ่-เล็กต้องตรง) — ตรวจชื่อ folder และไฟล์ใน S3" },
       { problem: "รอ 15+ นาทีแล้ว ยังเจอ AccessDenied", cause: "Bucket policy ข้อ 67 ผิด — อาจลืมเปลี่ยน RESOURCE_ARN (ข้อ 64) หรือ CLOUDFRONT_DISTRIBUTION_ARN (ข้อ 65) หรือลืมต่อ /* ท้าย Resource ARN", fix: "ไป S3 → LabBucket → Permissions → Bucket policy → Edit → ตรวจว่า:\n1. Resource เป็น arn:aws:s3:::bucket-name/* (มี /*)\n2. AWS:SourceArn เป็น ARN ของ CloudFront distribution (ไม่ใช่ domain name)\n3. ไม่มี RESOURCE_ARN หรือ CLOUDFRONT_DISTRIBUTION_ARN placeholder เหลืออยู่" }
@@ -204,6 +208,7 @@ const lab6Data = {
     { num: 127, task: "Task 8.3", desc: "กลับไปที่ S3 console Bucket policy editor", errors: [] },
     { num: 128, task: "Task 8.3", desc: "วาง JSON policy ที่แก้ไขแล้วลงใน Policy editor", errors: [] },
     { num: 129, task: "Task 8.3", desc: "กด Save changes", errors: [
+      { problem: "Save bucket policy ไม่ได้ ขึ้น error ยาวๆ อ่านไม่รู้เรื่อง", cause: "DestinationBucket ยังเปิด Block all public access อยู่ — S3 จะไม่ยอมให้ save policy ที่เปิด public read ถ้า block ยังเปิด error ที่ขึ้นจึงยาวและไม่ตรงประเด็น", fix: "ไปเอา block ออกก่อน: S3 → DestinationBucket → tab Permissions → Block public access → Edit → เอาติ๊ก Block all public access ออก → Save → พิมพ์ confirm\nแล้วกลับมา Save bucket policy อีกครั้ง จะผ่าน\nสาเหตุคือตอนสร้าง bucket นี้ลืมเอาติ๊กออก (ข้อ 115) — แก้ย้อนหลังได้ ไม่ต้องสร้าง bucket ใหม่" },
       { problem: "เจอ error 'Invalid JSON' หรือ 'Malformed Policy'", cause: "JSON syntax ผิด หรือ ARN ไม่ถูกต้อง", fix: "Select All → ลบ → paste JSON ใหม่ → ตรวจว่า RESOURCE_ARN ถูกแทนที่ด้วย ARN จริง + /* และไม่มี syntax error" }
     ]},
     { num: 130, task: "Task 8.4", desc: "คลิก General purpose buckets ในเมนู navigation", errors: [] },

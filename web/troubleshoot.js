@@ -5,7 +5,7 @@ lab2: [
     title: "หน้าเว็บเข้าไม่ได้",
     when: "เปิด URL ของ Public Instance แล้ว browser โหลดไม่ขึ้น / timeout",
     checks: [
-      { where: "EC2 → Instances → เลือก Public Instance", check: "Instance state", expect: "Running + Status 2/2 checks passed", ifNot: "รอ 2-3 นาที refresh | ถ้านานเกิน 5 นาที terminate แล้ว launch ใหม่" },
+      { where: "EC2 → Instances → เลือก Public Instance", check: "Instance state", expect: "Running + Status 3/3 checks passed", ifNot: "รอ 2-3 นาที refresh | ถ้านานเกิน 5 นาที terminate แล้ว launch ใหม่" },
       { where: "EC2 → Instances → เลือก Public Instance → tab Networking", check: "Public IPv4 address", expect: "มีค่า (เช่น 3.x.x.x)", ifNot: "ตอน launch ไม่ได้ Enable auto-assign public IP → terminate + launch ใหม่เลือก Enable (ข้อ 60)" },
       { where: "EC2 → Security Groups → เลือก Public SG → tab Inbound rules", check: "Inbound rule", expect: "Type=HTTP, Port=80, Source=0.0.0.0/0 (Anywhere-IPv4)", ifNot: "Edit inbound rules → Add rule → HTTP + Anywhere-IPv4 → Save" },
       { where: "VPC → Route tables → เลือก Public Route Table → tab Routes", check: "Route 0.0.0.0/0", expect: "Target = igw-xxxxx (Internet Gateway)", ifNot: "Edit routes → Add route → 0.0.0.0/0 → Internet Gateway → Save" },
@@ -20,7 +20,7 @@ lab2: [
     checks: [
       { where: "EC2 → Instances → เลือก Public Instance → tab Tags", check: "Tag Name", expect: "Public Instance (P ตัวใหญ่, I ตัวใหญ่, มีเว้นวรรค)", ifNot: "Edit tags → แก้ Name = Public Instance → Save | อาจต้องรอ 2-3 นาทีให้ SSM re-register" },
       { where: "EC2 → Instances → เลือก Public Instance → tab Security → IAM Role", check: "IAM Role", expect: "EC2InstProfile", ifNot: "Actions → Security → Modify IAM role → เลือก EC2InstProfile → Update" },
-      { where: "EC2 → Instances → เลือก Public Instance", check: "Instance state + Status check", expect: "Running + 2/2 checks passed", ifNot: "รอ 3-5 นาทีหลัง launch ให้ SSM agent register" },
+      { where: "EC2 → Instances → เลือก Public Instance", check: "Instance state + Status check", expect: "Running + 3/3 checks passed", ifNot: "รอ 3-5 นาทีหลัง launch ให้ SSM agent register — Session Manager ไม่ได้อัปเดตแบบ real time ต้องให้ instance boot เสร็จและ register กับ SSM ก่อน" },
       { where: "VPC → Route tables → Public Route Table → Routes", check: "Route 0.0.0.0/0 → IGW", expect: "มี route ไป Internet Gateway", ifNot: "SSM ต้องการ internet — เพิ่ม route 0.0.0.0/0 → IGW" }
     ]
   },
@@ -34,6 +34,18 @@ lab2: [
       { where: "VPC → NAT gateways → เลือก Lab NGW → ดู Subnet", check: "Subnet", expect: "Public Subnet (ไม่ใช่ Private!)", ifNot: "NAT ต้องอยู่ใน Public Subnet → delete แล้วสร้างใหม่ใน Public Subnet" },
       { where: "VPC → Route tables → Public Route Table → Routes", check: "Route 0.0.0.0/0 → IGW", expect: "มี (NAT ต้องออก internet ผ่าน IGW)", ifNot: "เพิ่ม route 0.0.0.0/0 → IGW ใน Public Route Table" },
       { where: "VPC → Internet gateways → Lab IGW", check: "State", expect: "Attached กับ Lab VPC", ifNot: "Attach IGW กับ Lab VPC" }
+    ]
+  },
+  {
+    title: "ตั้งค่าผิดไปแล้ว — แก้ได้เอง หรือต้อง terminate?",
+    when: "ผู้เรียนตั้งค่าผิดตอน launch instance หรือตอนสร้าง resource แล้วถามว่าต้องเริ่มใหม่ไหม",
+    checks: [
+      { where: "ตัว resource ที่ตั้งผิด", check: "เป็น instance หรือ resource รอบข้าง (subnet / route table / SG)", expect: "resource รอบข้างแก้ย้อนหลังได้", ifNot: "ถ้าเป็นค่าที่ผูกกับ instance ตอน launch (IAM role, user data, auto-assign public IP) มัก terminate แล้ว launch ใหม่เร็วกว่า เพราะ lab จำกัด permission ที่ใช้แก้ instance ไว้" },
+      { where: "Subnet → Actions → Edit subnet settings", check: "auto-assign public IPv4", expect: "แก้ที่ subnet ได้ (ข้อ 17)", ifNot: "แก้ subnet ได้ แต่ instance ที่ launch ไปก่อนแล้วจะไม่ได้ Public IP ย้อนหลัง — ตัวนั้นต้อง terminate แล้ว launch ใหม่ (ข้อ 60)" },
+      { where: "Route tables → tab Subnet associations", check: "subnet association", expect: "Edit subnet associations ได้ตลอด (ข้อ 38)", ifNot: "อันนี้แก้ได้ ไม่ต้อง terminate อะไร" },
+      { where: "Security Groups → Inbound rules", check: "inbound rule", expect: "Edit inbound rules เพิ่ม/ลบ rule ได้ตลอด (ข้อ 42)", ifNot: "SG แก้ได้ และเปลี่ยน SG ที่ผูกกับ instance ก็ทำได้ — แต่ถ้า SG สร้างผิด VPC ต้อง delete แล้วสร้างใหม่ใน Lab VPC" },
+      { where: "EC2 → เลือก instance → tab Security → Actions → Security → Modify IAM role", check: "แก้ IAM role ได้ไหม", expect: "ถ้าไม่ขึ้น AccessDenied ก็แก้ได้ แล้ว Stop & Start ให้ SSM agent หยิบ role ใหม่", ifNot: "ถ้าขึ้น AccessDenied / not authorized คือ lab ปิด permission ไว้ — หยุดไล่แก้ terminate แล้ว launch ใหม่ให้ครบทุกค่าตั้งแต่แรก (ข้อ 64)" },
+      { where: "ภายใน instance ผ่าน Session Manager", check: "สิ่งที่จะแก้เป็นคำสั่งใน OS หรือ AWS API", expect: "คำสั่งใน OS (ติดตั้ง httpd, แก้ไฟล์) ทำได้เสมอ ไม่ติด permission ของ lab", ifNot: "ถ้าเป็น AWS API (แก้ config ของ resource) อาจติด permission — เช่น user data ลืมใส่ ก็ sudo su แล้วรัน script เองได้ (ข้อ 65) แต่ต้องมี IAM role ให้ SSM เข้าได้ก่อน" }
     ]
   }
 ],
@@ -160,6 +172,29 @@ lab7: [
   }
 ],
 
-lab1: []
+lab1: [
+  {
+    title: "สร้าง resource ไม่ได้ / ติด permission",
+    when: "กด Create bucket หรือ run คำสั่ง CLI แล้วขึ้น AccessDenied, not authorized, ไม่มี permission",
+    checks: [
+      { where: "Region selector มุมบนขวาของ console", check: "Region ที่เลือกอยู่", expect: "ตรงกับ Region ที่ lab instruction ระบุ (เคสที่เจอบ่อยคือ Oregon / us-west-2)", ifNot: "เปลี่ยน Region ให้ตรงก่อน แล้วลองใหม่ — lab ให้ permission แค่ Region เดียว ทำใน Region อื่นถูกปฏิเสธทั้งหมด (ข้อ 11)" },
+      { where: "หน้า lab ด้านซ้าย", check: "ปุ่ม End Lab ถูกกดไปแล้วหรือยัง", expect: "ยังไม่กด — lab ยังอยู่ในสถานะ started", ifNot: "เผลอกด End Lab = permission ถูกถอนทั้งหมด แต่ tab console เก่ายังค้างเปิดอยู่จึงดูเหมือนใช้ได้ | กด Start Lab ใหม่ → Open Console ใหม่ → ปิด tab เก่าให้หมด" },
+      { where: "S3 → ชื่อ bucket ที่กรอก", check: "รูปแบบชื่อ bucket", expect: "labbucket-NUMBER ตัวเล็กทั้งหมด เช่น labbucket-987987", ifNot: "ถ้า Region ถูกแล้วแต่ยังสร้างไม่ได้ มักเป็นเรื่องชื่อ — ชื่อ S3 ต้องไม่ซ้ำกับใครทั้งโลก ให้เปลี่ยนเลขท้าย (ข้อ 35)" },
+      { where: "navigation bar มุมบนขวา", check: "user ที่ login อยู่", expect: "AWSLabsUser ของ lab", ifNot: "ถ้าเป็น account อื่น ให้ sign out แล้วกด Open Console จากหน้า lab ใหม่" },
+      { where: "สิ่งที่ผู้เรียนพยายามทำ", check: "อยู่ในขอบเขตที่ lab guide บอกให้ทำหรือไม่", expect: "ทำตามที่ lab guide ระบุ", ifNot: "lab instruction เขียนไว้เองว่า service ที่ lab ไม่ได้ใช้จะถูกปิดไว้ และ service ที่ใช้ก็เปิดความสามารถเฉพาะเท่าที่ lab ต้องการ — ถ้าทำนอกเหนือจากนั้นจะเจอ error เป็นเรื่องปกติ ไม่ใช่ผู้เรียนทำผิด\nบอกผู้เรียนได้เลยว่าอันนั้นทำไม่ได้ใน lab ไม่ต้องเสียเวลาไล่แก้" }
+    ]
+  },
+  {
+    title: "terminal / Session Manager เข้าไม่ได้",
+    when: "หา terminal ไม่เจอ หรือกด Connect แล้วเข้าไม่ได้",
+    checks: [
+      { where: "ตำแหน่งที่ผู้เรียนกำลังหา terminal", check: "เปิดจากที่ไหน", expect: "EC2 console → Instances → Command Host → Connect → tab SSM Session Manager", ifNot: "terminal ไม่ได้อยู่ในหน้า lab — ต้องเข้าผ่าน EC2 console เท่านั้น (ข้อ 44 ถึง ข้อ 49)" },
+      { where: "EC2 → Instances → Command Host", check: "Instance state", expect: "Running (Command Host เป็น instance ที่ lab เตรียมมาให้ ไม่ได้ launch เอง)", ifNot: "ถ้าเพิ่ง Start Lab ให้รอ 2-3 นาทีให้ provisioning เสร็จและ SSM agent register แล้ว refresh + กด Connect ใหม่" },
+      { where: "แผงด้านซ้ายของหน้า lab", check: "ค่า CommandHostSessionUrl", expect: "มีค่าให้ copy", ifNot: "ทางสำรองที่ lab เตรียมไว้: copy ค่า CommandHostSessionUrl จากแผงด้านซ้ายของหน้า lab ไปวางใน browser tab ใหม่ → terminal ของ Command Host จะเปิดขึ้นตรงๆ\nใช้ได้เลยถ้าปุ่ม Connect ใน console กดไม่ขึ้นหรือ error" },
+      { where: "EC2 → Instances", check: "เห็น Command Host ในลิสต์ไหม", expect: "มี Command Host อยู่ในลิสต์", ifNot: "Region ผิด หรือ lab provisioning ยังไม่เสร็จ — ตรวจ Region ก่อน แล้วรอ 1-2 นาที refresh (ข้อ 46)" },
+      { where: "tab ที่เลือกในหน้า Connect", check: "connection method", expect: "SSM Session Manager", ifNot: "เลือก tab SSM Session Manager ไม่ใช่ EC2 Instance Connect หรือ SSH (ข้อ 48)" }
+    ]
+  }
+]
 
 };

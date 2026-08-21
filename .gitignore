@@ -1,0 +1,9 @@
+# Source lab instruction PDFs — local reference only, not part of the tool
+web/lab pdf/
+
+# macOS archive junk
+__MACOSX/
+.DS_Store
+
+# Node
+node_modules/

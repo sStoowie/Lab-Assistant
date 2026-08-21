@@ -85,21 +85,30 @@ const lab7Data = {
     ]},
     { num: 53, task: "Task 3.1", desc: "ค้นหา EFS ใน search bar ของ AWS Console", errors: [] },
     { num: 54, task: "Task 3.2", desc: "กด Create file system", errors: [] },
-    { num: 55, task: "Task 3.2", desc: "กด Customize (ไม่ใช้ quick create)", errors: [] },
+    { num: 55, task: "Task 3.2", desc: "กด Customize (ไม่ใช้ quick create)", errors: [
+      { problem: "กด Create แบบ quick create ไปเลย ไม่ได้กด Customize", cause: "quick create ไม่เปิดให้ตั้งค่าที่ lab กำหนด — จะได้ค่า default คือ encryption เปิด, automatic backups เปิด, และ mount target ใช้ default SG กับ subnet ที่ระบบเลือกให้ ซึ่งไม่ตรงข้อกำหนดทั้งหมด", fix: "ต้องกด Customize เพื่อไล่ตั้งค่าเอง (ข้อ 56 ถึง ข้อ 67)\nถ้าสร้างด้วย quick create ไปแล้ว: ค่าที่แก้ย้อนหลังได้คือ backups, throughput, lifecycle และ mount target แต่ encryption แก้ไม่ได้ (ข้อ 59) ถ้าติด encryption ให้ลบ file system แล้วสร้างใหม่ด้วย Customize" }
+    ]},
     { num: 56, task: "Task 3.2", desc: "Name = myWPEFS", errors: [] },
     { num: 57, task: "Task 3.2", desc: "เอาเครื่องหมายถูกออกจาก Enable automatic backups", errors: [] },
     { num: 58, task: "Task 3.2", desc: "Lifecycle Management: Transition into IA = None, Transition into Archive = None", errors: [] },
-    { num: 59, task: "Task 3.2", desc: "เอาเครื่องหมายถูกออกจาก Enable encryption of data at rest", errors: [] },
+    { num: 59, task: "Task 3.2", desc: "เอาเครื่องหมายถูกออกจาก Enable encryption of data at rest", errors: [
+      { problem: "ลืมเอาติ๊ก encryption ออก — สร้าง file system ไปแล้วโดยที่ encryption ยังเปิด", cause: "ช่องนี้ถูกติ๊กไว้เป็น default อยู่แล้ว ถ้าไม่สังเกตจะติ๊กค้างไป | lab กำหนดให้ปิด encryption at rest", fix: "encryption at rest แก้ย้อนหลังไม่ได้ — ต้องลบ file system แล้วสร้างใหม่ (ข้อ 54) โดยเอาติ๊กออกก่อนกด Create\nก่อนลบให้เช็คว่ายังไม่มีอะไรใช้ file system นี้อยู่ | รอบใหม่ให้ไล่เช็คให้ครบทีเดียว: backups ปิด (ข้อ 57), encryption ปิด, throughput = Bursting (ข้อ 60), performance = General Purpose (ข้อ 61)" }
+    ]},
     { num: 60, task: "Task 3.2", desc: "Performance Settings: Throughput mode = Bursting", errors: [] },
     { num: 61, task: "Task 3.2", desc: "Additional settings: Performance mode = General Purpose (Recommended)", errors: [] },
     { num: 62, task: "Task 3.2", desc: "Tags: Key = Name, Value = myWPEFS", errors: [] },
     { num: 63, task: "Task 3.2", desc: "กด Next ไปหน้า Network access", errors: [] },
     { num: 64, task: "Task 3.2", desc: "VPC = LabVPC", errors: [] },
     { num: 65, task: "Task 3.2", desc: "Mount target AZ1: Subnet = AppSubnet1, Security groups = EFSMountTargetSecurityGroup (กด X ลบ default SG ออก)", errors: [
+      { problem: "เลือก subnet ของ mount target เป็น DatabaseSubnet แทน AppSubnet", cause: "ข้อกำหนดของ lab เขียนแยกกัน 2 บรรทัดและอ่านสับสนง่าย — ให้ดู AZ จากที่ DatabaseSubnet1/DatabaseSubnet2 อยู่ แต่ subnet ที่ต้องใส่จริงคือ AppSubnet1/AppSubnet2 | หลายคนอ่านแล้วใส่ DatabaseSubnet ไปเลย", fix: "จำเป็นคู่: AZ เอาจาก DatabaseSubnet แต่ subnet ที่ผูก mount target เอา AppSubnet — เพราะ EFS ต้องให้ web server ใน App subnet mount ได้\nAZ1 ใส่ AppSubnet1, AZ2 ใส่ AppSubnet2 (ข้อ 66)\nถ้าใส่ผิดไปแล้วแก้ได้ ไม่ต้องสร้าง file system ใหม่: EFS → เลือก file system → tab Network → Manage → แก้ subnet ของแต่ละ mount target → Save" },
+      { problem: "ลืมลบ default security group ออก หรือหา EFSMountTargetSecurityGroup ไม่เจอ", cause: "ช่อง Security groups มี default SG ใส่มาให้อยู่แล้ว ถ้าไม่กด X ลบออกจะเหลือ 2 SG | ถ้าหา EFSMountTargetSecurityGroup ไม่เจอ มักเป็นเพราะยังไม่ได้เลือก VPC = LabVPC ข้างบน (ข้อ 64)", fix: "กด X ลบ default SG ออกก่อน แล้วเลือก EFSMountTargetSecurityGroup ให้เหลือตัวเดียว\nถ้า dropdown ว่างเปล่า ให้ย้อนไปตั้ง VPC = LabVPC ที่ข้อ 64 ก่อน แล้ว SG ของ VPC นั้นจะขึ้นมา\nSG ของ mount target แก้ย้อนหลังได้ที่ tab Network → Manage" },
       { problem: "เลือก subnet ผิด (เช่น DatabaseSubnet หรือ PublicSubnet) หรือลืมลบ default security group", cause: "ต้องเลือก AppSubnet (ไม่ใช่ DatabaseSubnet) เพราะ EFS mount point ต้องอยู่ใน App layer | ลืมลบ default SG ทำให้ mount ไม่ได้", fix: "เลือก AppSubnet1 (CIDR 10.0.2.0/24) สำหรับ AZ1 | เลือก EFSMountTargetSecurityGroup แล้วกด X ลบ default SG ออก" }
     ]},
     { num: 66, task: "Task 3.2", desc: "Mount target AZ2: Subnet = AppSubnet2, Security groups = EFSMountTargetSecurityGroup (กด X ลบ default SG ออก)", errors: [] },
-    { num: 67, task: "Task 3.2", desc: "กด Next → หน้า File system policy (ไม่ต้องตั้งค่า) → กด Next → หน้า Review → กด Create", errors: [] },
+    { num: 67, task: "Task 3.2", desc: "กด Next → หน้า File system policy (ไม่ต้องตั้งค่า) → กด Next → หน้า Review → กด Create", errors: [
+      { problem: "ลืมจด File system ID ไว้", cause: "lab เตือนไว้ว่าต้องจด File system ID เก็บไว้ใช้ตอนหลัง — จะใช้ตอน mount EFS ใน user data ของ web server (Task 5)", fix: "ไม่ต้องกังวล กลับไปดูได้ตลอด: EFS → File systems → กดชื่อ myWPEFS → ดูช่อง File system ID (รูปแบบ fs-xxxxxxxxx)\nแนะนำให้ copy เก็บใน notepad ไว้เลย เพราะจะต้องใช้ตอนตั้งค่า Task 5" },
+      { problem: "เผลอสร้าง file system policy ที่หน้า File system policy", cause: "lab ระบุว่าไม่ต้องสร้าง policy ตอนนี้ แต่หน้านี้มีปุ่มให้ตั้งค่าอยู่ ถ้าใส่ policy ที่ผิดอาจบล็อกการ mount", fix: "ปล่อยหน้า File system policy ว่างไว้ กด Next ผ่านไปเลย\nถ้าใส่ไปแล้วและ mount ไม่ได้: EFS → file system → tab File system policy → Edit → ลบ policy ออก → Save" }
+    ]},
     { num: 68, task: "Task 3.3", desc: "Copy File system ID (รูปแบบ fs-xxxxxxxx) จากหน้า File systems เก็บไว้ใน text editor", errors: [
       { problem: "ลืม copy File system ID → ตอน Task 5 ไม่มีค่าใส่", cause: "ถ้าไม่ copy ตอนนี้ ต้องย้อนกลับมาหาภายหลัง", fix: "กลับมา copy ได้: EFS console → File systems → copy File system ID ของ myWPEFS (รูปแบบ fs-xxxxxxxx)" }
     ]},

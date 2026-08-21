@@ -180,7 +180,7 @@ const specsHTML = {
       <li>VPC: <strong>LabVPC</strong></li>
       <li>Public access: <strong>No</strong></li>
       <li>SG: <strong>LabDBSecurityGroup</strong> (ลบ default ออก!)</li>
-      <li>DB instance identifier: <code>LabDBReplica</code></li>
+      <li>DB instance identifier: <code>LabDBreplica</code></li>
     </ul></div>
   `,
 

@@ -9,6 +9,7 @@
 </head>
 <body>
     <div class="custom-cursor" id="cursor"></div>
+    <div id="errorBanner" class="app-error hidden" role="alert" aria-live="assertive"></div>
     <div class="app">
         <!-- HOMEPAGE -->
         <div id="homepage">
@@ -30,11 +31,25 @@
                 <p id="labDesc" class="lab-desc"></p>
             </header>
 
+            <div class="toolbar">
+                <div class="jump-group">
+                    <label for="jumpInput">Jump</label>
+                    <input type="number" id="jumpInput" min="1" step="1" placeholder="#" aria-label="ไปที่เลขข้อ">
+                    <button type="button" id="jumpBtn">Go</button>
+                </div>
+                <div class="search-group">
+                    <label for="searchInput">Search</label>
+                    <input type="search" id="searchInput" placeholder="ค้นหา error ที่ผู้เรียนเจอ, ชื่อ resource, keyword…" aria-label="ค้นหา step และ error">
+                    <button type="button" id="clearSearchBtn">Clear</button>
+                </div>
+            </div>
+            <p id="searchStatus" class="search-status hidden" role="status" aria-live="polite"></p>
+
             <div class="spec-section">
-                <div class="spec-tabs">
-                    <button class="spec-tab active" data-tab="spec">Spec</button>
-                    <button class="spec-tab" data-tab="steps">Steps & Errors</button>
-                    <button class="spec-tab" data-tab="troubleshoot">Troubleshoot</button>
+                <div class="spec-tabs" role="tablist">
+                    <button class="spec-tab active" data-tab="spec" role="tab" aria-selected="true">Spec</button>
+                    <button class="spec-tab" data-tab="steps" role="tab" aria-selected="false">Steps & Errors</button>
+                    <button class="spec-tab" data-tab="troubleshoot" role="tab" aria-selected="false">Troubleshoot</button>
                 </div>
                 <div id="tab-spec" class="tab-content"></div>
                 <div id="tab-steps" class="tab-content hidden"></div>

@@ -5,7 +5,8 @@ const lab1Data = {
     { num: 1, task: "Start Lab", desc: "กด Start Lab ที่หน้า lab", errors: [] },
     { num: 2, task: "Start Lab", desc: "กด Open Console เพื่อเปิด AWS Management Console", errors: [
       { problem: "เจอหน้า 'You must first sign out'", cause: "Browser มี session ของ AWS account อื่นค้างอยู่", fix: "กด 'click here' เพื่อ logout → ปิด tab Sign In → กลับมาที่หน้า lab → กด Open Console ใหม่ | หรือใช้ Incognito window" },
-      { problem: "กด Start Lab แล้วไม่มีอะไรเกิดขึ้น", cause: "Pop-up blocker ของ browser บล็อก console window", fix: "เพิ่ม domain ของ lab ใน pop-up allow list หรือปิด pop-up blocker → refresh หน้า → กดใหม่" }
+      { problem: "กด Start Lab แล้วไม่มีอะไรเกิดขึ้น", cause: "Pop-up blocker ของ browser บล็อก console window", fix: "เพิ่ม domain ของ lab ใน pop-up allow list หรือปิด pop-up blocker → refresh หน้า → กดใหม่" },
+      { problem: "ติด permission ทุกอย่าง — ทำอะไรก็ AccessDenied ทั้ง lab", cause: "เผลอกด End Lab ไปแล้ว (ข้อ 61) — พอจบ lab ระบบจะถอน permission ทั้งหมด แต่ tab console ที่เปิดอยู่ยังค้างอยู่ ทำให้ดูเหมือน console ใช้ได้ปกติ", fix: "กด Start Lab ใหม่ → กด Open Console ใหม่ → ปิด tab console เก่าทิ้งให้หมด | ถ้าผู้เรียนบอกว่า 'เมื่อกี้ทำได้อยู่' แล้วพังทั้ง lab ให้เช็คข้อนี้ก่อนเลย" }
     ]},
     { num: 3, task: "Task 1.1", desc: "ที่ navigation bar มุมบนขวา กด Region selector แล้วเลือก Region ที่ต้องการ", errors: [
       { problem: "เลือก Region แล้วเปิดหน้าเว็บอื่นแทน console", cause: "บาง Region อาจ redirect ไปหน้าอื่น", fix: "กด Cancel แล้วลองเลือก Region อื่น | หรือกด AWS logo มุมซ้ายบนเพื่อกลับ console home" }
@@ -50,10 +51,14 @@ const lab1Data = {
     { num: 35, task: "Task 2", desc: "ในส่วน General configuration ใส่ Bucket name เป็น labbucket-NUMBER (แทน NUMBER ด้วยตัวเลข random เช่น labbucket-987987)", errors: [
       { problem: "เจอ error 'Bucket name already exists' หรือ 'Bucket name is not available'", cause: "S3 bucket name ต้อง unique ทั่วโลก — ชื่อที่ใส่มีคนอื่นใช้แล้ว", fix: "เปลี่ยนตัวเลขหลัง labbucket- เป็นเลข random อื่น เช่น labbucket-123456 | ชื่อต้อง: ตัวเล็กทั้งหมด, ไม่มี space, ไม่มี underscore" },
       { problem: "เจอ error 'Bucket name invalid'", cause: "ชื่อ bucket มี uppercase, space, underscore หรือ special characters", fix: "ใช้ lowercase + ตัวเลข + ขีดกลาง (-) เท่านั้น | ห้ามมี space, underscore, uppercase, จุดนำหน้า/ตามหลัง" },
-      { problem: "Region ไม่ตรงกับ LabRegion", cause: "Region selector ถูกเปลี่ยนระหว่างทำ Task 1", fix: "ตรวจ Region selector มุมบนขวาว่าตรงกับ LabRegion จากด้านซ้ายของ lab ก่อนกด Create" }
+      { problem: "Region ไม่ตรงกับ LabRegion", cause: "Region selector ถูกเปลี่ยนระหว่างทำ Task 1", fix: "ตรวจ Region selector มุมบนขวาว่าตรงกับ LabRegion จากด้านซ้ายของ lab ก่อนกด Create" },
+      { problem: "สร้าง bucket ไม่ได้ — ตั้งชื่ออะไรก็ไม่ผ่าน", cause: "ตั้งชื่อไม่ตรงกับรูปแบบที่ lab กำหนด — lab ตรวจชื่อ bucket ตอนให้คะแนน ต้องขึ้นต้นด้วย labbucket- เท่านั้น", fix: "ใช้รูปแบบ labbucket-NUMBER เช่น labbucket-987987 (ขีดกลาง ไม่ใช่ underscore) | ห้ามเปลี่ยนคำว่า labbucket เป็นอย่างอื่น เปลี่ยนได้แค่ตัวเลขท้าย" }
     ]},
     { num: 36, task: "Task 2", desc: "ปล่อย settings อื่นทั้งหมดเป็น default", errors: [] },
-    { num: 37, task: "Task 2", desc: "กด Create bucket ที่ด้านล่างสุดของหน้า", errors: [] },
+    { num: 37, task: "Task 2", desc: "กด Create bucket ที่ด้านล่างสุดของหน้า", errors: [
+      { problem: "ไม่มี permission ในการสร้าง — กด Create bucket แล้วขึ้น AccessDenied / not authorized", cause: "Region ไม่ตรงกับที่ lab กำหนด — lab ให้ permission เฉพาะ Region ที่ระบุไว้เท่านั้น พอสร้างใน Region อื่นจึงถูกปฏิเสธ (เคสที่เจอบ่อยคือต้องเป็น Oregon / us-west-2)", fix: "เปลี่ยน Region selector มุมบนขวาให้ตรงกับที่ lab instruction ระบุ (ข้อ 11) แล้วกด Create ใหม่ | Region ที่ต้องใช้มีบอกไว้ใน instruction แล้ว ให้ผู้เรียนเปิดอ่านย้อนดู" },
+      { problem: "Region ถูกแล้ว แต่ยังสร้าง bucket ไม่ได้", cause: "ชื่อ bucket ซ้ำกับคนอื่นในโลก — ไม่ใช่ปัญหา permission แล้ว | instruction ระบุไว้ว่าชื่อ bucket ของ S3 ต้องไม่ซ้ำกับใครทั้งโลก และต้องเป็นไปตามข้อกำหนดการตั้งชื่อของ DNS", fix: "เปลี่ยนตัวเลขท้ายชื่อเป็นเลขอื่น เช่น labbucket-451236 แล้วลองใหม่ | ไล่ลำดับตรวจ: Region ถูกไหม (ข้อ 11) → ถ้าถูก แปลว่าเป็นเรื่องชื่อซ้ำ ให้เปลี่ยนเลข" }
+    ]},
     { num: 38, task: "Task 3", desc: "ดาวน์โหลดรูป HappyFace.jpg จาก link ใน lab instructions (คลิกขวา → Save image as)", errors: [
       { problem: "คลิกขวาแล้วไม่เห็น Save image หรือ save ได้เป็น format อื่น", cause: "แต่ละ browser มีวิธี save ต่างกัน", fix: "Chrome/Edge: คลิกขวา → Save image as | Firefox: คลิกขวา → Save Image As | ตั้งชื่อเป็น HappyFace.jpg" }
     ]},
@@ -72,8 +77,10 @@ const lab1Data = {
     { num: 47, task: "Task 4.1", desc: "กด Connect", errors: [] },
     { num: 48, task: "Task 4.1", desc: "เลือก tab SSM Session Manager", errors: [] },
     { num: 49, task: "Task 4.1", desc: "กด Connect เพื่อเปิด terminal", errors: [
-      { problem: "ปุ่ม Connect เป็นสีเทากดไม่ได้", cause: "Instance ยังไม่พร้อม หรือ SSM Agent ยังไม่ register", fix: "รอ 2-3 นาทีหลัง instance เป็น Running แล้วลอง refresh + กด Connect ใหม่ | ตรวจว่า instance state=Running + 2/2 checks" },
-      { problem: "Connect ได้แต่ terminal ว่างเปล่าหรือค้าง", cause: "Session ยังกำลังเชื่อมต่อ", fix: "รอ 10-15 วินาที terminal จะ ready | ถ้าค้างนานเกิน 30 วินาที ให้ปิด tab แล้วกด Connect ใหม่" }
+      { problem: "ปุ่ม Connect เป็นสีเทากดไม่ได้", cause: "Instance ยังไม่พร้อม หรือ SSM Agent ยังไม่ register — Command Host เป็น instance ที่ lab เตรียมมาให้ ถ้าเพิ่ง Start Lab ก็ยังไม่พร้อม", fix: "รอ 2-3 นาทีหลัง instance state เป็น Running แล้ว refresh + กด Connect ใหม่ | ตรวจว่า Status check ขึ้นครบทุกข้อแล้ว (console จะแสดงจำนวนเอง)" },
+      { problem: "Connect ได้แต่ terminal ว่างเปล่าหรือค้าง", cause: "Session ยังกำลังเชื่อมต่อ", fix: "รอ 10-15 วินาที terminal จะ ready | ถ้าค้างนานเกิน 30 วินาที ให้ปิด tab แล้วกด Connect ใหม่" },
+      { problem: "terminal เข้าไม่ได้ / หา terminal ไม่เจอ", cause: "เปิดผิดที่ — ไปหา terminal ในหน้า lab (account lab) แทนที่จะเปิดจาก EC2 console", fix: "terminal ของ lab นี้อยู่ใน EC2 console เท่านั้น: ค้นหา EC2 (ข้อ 44) → Instances (ข้อ 45) → ติ๊ก Command Host (ข้อ 46) → Connect (ข้อ 47) → tab SSM Session Manager (ข้อ 48) → Connect | ไม่ใช่ terminal หรือปุ่มใดๆ ในหน้า lab" },
+      { problem: "กด Connect ใน console แล้วไม่ขึ้น หรือ error ซ้ำๆ ไม่ยอมเข้า", cause: "ปัญหาที่ตัวปุ่ม Connect หรือ session ของ browser — ไม่ใช่ที่ instance | lab เตรียมทางสำรองไว้ให้แล้วแต่คนมักไม่รู้", fix: "ใช้ทางสำรองที่ lab ให้มา: copy ค่า CommandHostSessionUrl จากแผงด้านซ้ายของหน้า lab instruction → วางใน browser tab ใหม่ → terminal ของ Command Host เปิดขึ้นตรงๆ ไม่ต้องผ่านหน้า console เลย\nวิธีนี้ข้ามปัญหาปุ่ม Connect ไปได้ทั้งหมด เหมาะเวลารีบหรือมีผู้เรียนติดพร้อมกันหลายคน" }
     ]},
     { num: 50, task: "Task 4.2", desc: "พิมพ์คำสั่ง aws s3 ls แล้วกด Enter เพื่อดู list ของ buckets", errors: [
       { problem: "เจอ error 'Unable to locate credentials'", cause: "IAM role ของ Command Host instance ไม่ถูกต้อง หรือ instance profile ไม่ได้ attach", fix: "ไม่ควรเจอ error นี้ใน lab — ถ้าเจอลอง: ปิด Session Manager → กลับมากด Connect ใหม่ | หรือ Stop Lab → Start Lab ใหม่" },
@@ -90,6 +97,7 @@ const lab1Data = {
     { num: 55, task: "Task 4.2", desc: "พิมพ์คำสั่ง aws s3 cp /home/ssm-user/HappyFace.jpg s3://labclibucket-NUMBER แล้วกด Enter", errors: [
       { problem: "เจอ error 'No such file or directory'", cause: "ไฟล์ HappyFace.jpg ไม่อยู่ที่ path /home/ssm-user/ หรือชื่อไฟล์ผิด", fix: "ลอง ls /home/ssm-user/ เพื่อดูว่ามีไฟล์อะไรอยู่ | ถ้าไม่เห็น HappyFace.jpg แสดงว่า lab ยังไม่ได้วางไฟล์ไว้ → ลอง Stop Lab → Start Lab ใหม่" },
       { problem: "เจอ error 'NoSuchBucket'", cause: "ชื่อ bucket ในคำสั่งไม่ตรงกับที่สร้างไว้ (ข้อ 52)", fix: "ตรวจว่าชื่อ bucket ในคำสั่ง cp ตรงกับชื่อที่ใช้ตอน mb ทุกตัวอักษร (ลอง aws s3 ls ดูชื่อจริง)" },
+      { problem: "ผู้เรียนถาม: เปิดดูรูป HappyFace.jpg ที่อยู่ใน instance ผ่าน console ได้ไหม?", cause: "ไม่ใช่ error — เป็นคำถามที่เจอบ่อย ผู้เรียนอยากเห็นรูปเพื่อยืนยันว่าไฟล์อยู่จริง", fix: "ตอบว่าไม่ได้ — instance เป็น Linux ที่ไม่มีหน้าจอ (ไม่มี GUI) ดูรูปตรงๆ ไม่ได้ ทำได้แค่ตรวจผ่าน CLI ว่าไฟล์มีอยู่จริง | ใช้ ls -l /home/ssm-user/ เพื่อดูว่ามีไฟล์และขนาดเท่าไหร่ | ถ้าอยากเห็นรูปจริงๆ ให้ไปเปิดใน S3 console หลัง upload เสร็จ (ข้อ 57)" },
       { problem: "คำสั่งไม่ทำงาน / ไม่มี output", cause: "อาจพิมพ์คำสั่งไม่ครบ หรือ copy มาแล้วมี hidden characters", fix: "ลอง clear terminal แล้วพิมพ์คำสั่งใหม่ทีละตัว | หรือ copy คำสั่งจาก lab page โดยกดไอคอน copy" }
     ]},
     { num: 56, task: "Task 4.2", desc: "เห็นข้อความ upload: ... to s3://labclibucket-xxxxx/HappyFace.jpg", errors: [] },

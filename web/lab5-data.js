@@ -14,6 +14,7 @@ const lab5Data = {
     { num: 5, task: "Task 1", desc: "กด Topics จากเมนูด้านซ้าย", errors: [] },
     { num: 6, task: "Task 1", desc: "กด Create topic", errors: [] },
     { num: 7, task: "Task 1", desc: "ในส่วน Details ตั้งค่า: Type=Standard, Name=resize-image-topic (ต่อด้วยเลข unique เช่น resize-image-topic-1234)", errors: [
+      { problem: "ตั้ง Topic Type ผิด เลือกเป็น FIFO แทน Standard", cause: "Type เลือกได้ครั้งเดียวตอนสร้าง เปลี่ยนทีหลังไม่ได้ | FIFO topic ต้องใช้กับ FIFO queue เท่านั้น พอไป subscribe queue แบบ Standard ในข้อ 17 จะไม่เห็น topic ให้เลือกหรือ subscribe ไม่ผ่าน", fix: "ไม่ต้อง End Lab — สร้าง topic ใหม่ได้เลย: SNS → Topics → Create topic → Type=Standard\nตั้งชื่อเดิมได้ถ้าลบตัวเก่าไปแล้ว หรือใช้ชื่อใหม่ก็ได้ แต่ต้องจำไว้ว่าต้อง copy ARN ของตัวใหม่ไปใช้ (ข้อ 9) และ subscribe queue ทั้ง 2 ตัวใหม่ (ข้อ 17 กับ ข้อ 26)\nลบ topic FIFO ตัวเก่าทิ้งกันสับสน" },
       { problem: "เจอ error 'Topic name already exists'", cause: "ชื่อ topic ซ้ำกับที่มีอยู่แล้วใน account/region", fix: "เปลี่ยนชื่อให้ unique เช่น resize-image-topic-1234 (เพิ่มตัวเลขต่อท้าย)" },
       { problem: "Lab ไม่ทำงานถูกต้องหลังจากสร้าง topic", cause: "เลือก Type เป็น FIFO แทน Standard", fix: "ต้องเลือก Type=Standard เท่านั้น! FIFO จะทำให้ lab ไม่สำเร็จ → ลบ topic แล้วสร้างใหม่เลือก Standard" }
     ]},
@@ -34,6 +35,7 @@ const lab5Data = {
     { num: 15, task: "Task 2.1", desc: "ที่ queue detail page เลือก tab SNS subscriptions", errors: [] },
     { num: 16, task: "Task 2.1", desc: "กด Subscribe to Amazon SNS topic", errors: [] },
     { num: 17, task: "Task 2.1", desc: "ในหน้า Subscribe เลือก resize-image-topic ที่สร้างไว้ จาก dropdown (หรือ paste ARN ถ้าไม่เห็นใน list)", errors: [
+      { problem: "ไม่เห็น resize-image-topic ใน dropdown ของ Use existing resource", cause: "dropdown บางครั้งไม่ดึง topic มาแสดง (โหลดช้า หรือเพิ่งสร้าง topic ไปเมื่อกี้) — ไม่ใช่ว่า topic ไม่มีอยู่", fix: "lab เตรียมทางสำรองไว้ให้แล้ว: เปลี่ยนตัวเลือกจาก Use existing resource ไปเป็น Enter Amazon SNS topic ARN แล้ว paste ARN ที่ copy เก็บไว้ (ข้อ 9) ลงไปเอง แล้วกด Save\nถ้าจำ ARN ไม่ได้ ไปเอาใหม่ที่ SNS → Topics → กดชื่อ topic → copy ช่อง ARN\nใช้วิธีเดียวกันได้ที่ข้อ 26 ตอน subscribe queue ตัวที่สอง | อย่าเพิ่งสร้าง topic ใหม่เพราะคิดว่าตัวเดิมหาย จะได้ topic ซ้ำและสับสน" },
       { problem: "ไม่เห็น resize-image-topic ใน dropdown", cause: "Topic อยู่คนละ region กับ queue หรือชื่อผิด", fix: "เลือก Enter Amazon SNS topic ARN แล้ว paste ARN ที่ copy ไว้จากข้อ 9 | ตรวจว่า Region ไม่ได้เปลี่ยน" }
     ]},
     { num: 18, task: "Task 2.1", desc: "กด Save", errors: [
@@ -63,6 +65,7 @@ const lab5Data = {
     { num: 32, task: "Task 2.3", desc: "ในส่วน Message details ใส่ Subject=Hello world", errors: [] },
     { num: 33, task: "Task 2.3", desc: "ในส่วน Message body เลือก Identical payload for all delivery protocols แล้วใส่ข้อความ เช่น Testing Hello world", errors: [] },
     { num: 34, task: "Task 2.3", desc: "ในส่วน Message attributes ตั้ง: Type=String, Name=Message, Value=Hello World", errors: [
+      { problem: "กด Publish แล้วขึ้น error ว่า non alphanumeric (invalid attribute name)", cause: "ช่อง Name ของ Message attributes รับได้แค่ตัวอักษรกับตัวเลข — มีอักษรพิเศษหรือช่องว่างหลุดเข้าไป มักเกิดจาก copy มาวางแล้วติดอักขระที่มองไม่เห็น", fix: "ลบข้อความในช่อง Name ให้หมดจริงๆ (กด Ctrl+A ในช่องแล้ว Delete) แล้วพิมพ์ Message ด้วยมือใหม่ ไม่ต้อง copy วาง\nตรวจว่าไม่มี space นำหน้าหรือต่อท้าย และไม่มีขีด จุด หรือ underscore | ถ้ายังไม่หาย ลบ attribute row นั้นทิ้งแล้ว Add ใหม่" },
       { problem: "ลืมใส่ Message attributes แล้วกด Publish ไปเลย", cause: "ไม่เป็นไร — message จะยัง publish ได้ แต่ attributes จะว่าง ซึ่งไม่กระทบ lab ที่เหลือ", fix: "ข้อนี้แค่ test ไม่กระทบ flow หลัก ข้ามได้" }
     ]},
     { num: 35, task: "Task 2.3", desc: "กด Publish message", errors: [
@@ -88,12 +91,14 @@ const lab5Data = {
       { problem: "กด Save changes แล้วเจอ error 'Invalid policy'", cause: "JSON format ผิด — อาจ copy มาไม่ครบ หรือ paste ทับ content เดิมไม่หมด", fix: "ลบ content ใน editor ให้เกลี้ยงก่อน (Ctrl+A → Delete) แล้ว paste JSON ใหม่ทั้งก้อน | ตรวจว่าไม่มี content เดิมปนอยู่" }
     ]},
     { num: 49, task: "Task 3.1", desc: "ใน JSON ที่ paste มา เปลี่ยน SNS_TOPIC_OWNER ทั้ง 2 จุดเป็น Topic owner (12-digit Account ID) ที่ copy ไว้จากข้อ 9", errors: [
+      { problem: "ใส่เลข account (aws user name) ผิดใน policy", cause: "เอา ARN หรือเลขอื่นมาใส่แทน 12-digit Account ID หรือใส่ครบแค่จุดเดียวจาก 2 จุด | บางคนพิมพ์เองแล้วเลขเพี้ยน", fix: "ไปเอาเลขจริงจาก SNS: SNS → Topics → กดชื่อ topic → ดูช่อง Topic owner จะเป็นเลข 12 หลักล้วนๆ ไม่มีขีด → copy มาวาง\nเปลี่ยนให้ครบทั้ง 2 จุดใน JSON (ใช้ Ctrl+F หาคำว่า SNS_TOPIC_OWNER ว่าเหลือค้างอยู่ไหม)\nถ้าใส่ผิดแล้ว Save ไปแล้วก็กลับมา Edit policy ใหม่ได้ ไม่ต้อง End Lab" },
       { problem: "กด Save แล้ว error หรือ S3 event notification ไม่ทำงาน", cause: "ไม่ได้เปลี่ยน SNS_TOPIC_OWNER เป็น Account ID จริง หรือเปลี่ยนไม่ครบ 2 จุด หรือลบ double quotes ออก", fix: "ตรวจว่า:\n1. เปลี่ยน SNS_TOPIC_OWNER ครบ 2 ตำแหน่ง\n2. ค่าเป็น 12-digit Account ID (ตัวเลขล้วน)\n3. ยังมี double quotes ครอบค่าอยู่ เช่น \"123456789012\"" }
     ]},
     { num: 50, task: "Task 3.1", desc: "ใน JSON เปลี่ยน SNS_TOPIC_ARN ทั้ง 2 จุดเป็น ARN ของ topic ที่ copy ไว้จากข้อ 9", errors: [
       { problem: "เปลี่ยน ARN แล้ว error", cause: "ARN format ผิด หรือเปลี่ยนไม่ครบ 2 จุด หรือลบ double quotes", fix: "ARN ต้องอยู่ในรูป arn:aws:sns:REGION:ACCOUNT:TOPIC_NAME | ตรวจว่ายังมี double quotes ครอบอยู่ | เปลี่ยนครบ 2 ตำแหน่ง" }
     ]},
     { num: 51, task: "Task 3.1", desc: "กด Save changes", errors: [
+      { problem: "กด Save changes แล้วขึ้น error ว่า policy ไม่ถูกต้อง / JSON ไม่ valid", cause: "ตอนแทน placeholder เผลอลบเครื่องหมายคำพูดคู่ที่ครอบค่าออกไปด้วย — lab เตือนเรื่องนี้ไว้เองว่าให้คงเครื่องหมายคำพูดไว้ | อีกสาเหตุคือ paste ทับแล้วโครงสร้าง JSON ขาดวงเล็บหรือ comma", fix: "ตรวจว่าค่าที่ใส่ยังมีเครื่องหมายคำพูดครอบอยู่ทั้ง 2 ข้าง เช่นต้องเป็นแบบ \"ARN ที่ copy มา\" ไม่ใช่ค่าเปล่าๆ ที่ไม่มีคำพูด\nใช้ Ctrl+F หาคำว่า SNS_TOPIC_OWNER กับ SNS_TOPIC_ARN ว่าไม่เหลือค้างอยู่เลย — แต่ละตัวมี 2 จุด รวมต้องแทน 4 จุด (ข้อ 49 กับ ข้อ 50)\nถ้าแก้ไม่หายจริงๆ ให้ลบเนื้อหาในช่องทั้งหมด แล้ว paste JSON จาก lab ใหม่ทั้งก้อน แล้วค่อยแทนค่าทีละจุดอย่างระวัง\npolicy นี้แก้ซ้ำได้ไม่จำกัด ไม่ต้อง End Lab" },
       { problem: "เจอ error 'Invalid parameter: Policy' ตอนกด Save", cause: "JSON syntax ผิด — อาจลืม comma, bracket, หรือ double quotes", fix: "Copy JSON จาก lab ใหม่ทั้งก้อน → paste ทับ → เปลี่ยน SNS_TOPIC_OWNER + SNS_TOPIC_ARN ใหม่อย่างระวัง" }
     ]},
     { num: 52, task: "Task 3.2", desc: "ค้นหา S3 ใน search bar", errors: [] },
@@ -110,6 +115,7 @@ const lab5Data = {
       { problem: "ลืมติ๊ก Event types หรือเลือกผิด type", cause: "ถ้าไม่ติ๊ก All object create events → S3 จะไม่ส่ง notification เมื่อ upload file", fix: "ต้องติ๊ก All object create events (s3:ObjectCreated:*) — ไม่ใช่ delete หรือ restore" }
     ]},
     { num: 59, task: "Task 3.2", desc: "ในส่วน Destination ตั้ง: Destination=SNS topic, Specify SNS topic=Choose from your SNS topics, เลือก resize-image-topic", errors: [
+      { problem: "สร้าง event notification ไม่ได้ / หา destination ไม่เจอ — ไม่เห็น resize-image-topic ให้เลือก", cause: "SNS access policy ยังไม่ยอมให้ S3 ส่ง event เข้า topic — script ที่ paste ในข้อ 48 ถูกแก้ไม่ครบ (ARN หรือ account ID ยังเป็น placeholder อยู่)", fix: "กลับไปแก้ policy ที่ SNS: SNS → Topics → กดชื่อ topic → Edit → expand Access policy → ตรวจว่าไม่มีคำว่า SNS_TOPIC_OWNER หรือ SNS_TOPIC_ARN ค้างอยู่แล้ว (ข้อ 49 กับ ข้อ 50) → Save changes\nแล้วกลับมาสร้าง event notification ใหม่ที่ S3 → topic จะโผล่ให้เลือก\nถ้ายังไม่เห็น ให้ลอง Save policy ใหม่อีกครั้งแล้ว refresh หน้า S3" },
       { problem: "เจอ error 'Unable to validate the following destination configurations' ตอน Save", cause: "SNS access policy ไม่ถูกต้อง — S3 ไม่มี permission publish ไปที่ SNS topic", fix: "ย้อนไปข้อ 48-51 ตรวจว่า SNS access policy JSON ถูกต้อง: SNS_TOPIC_OWNER และ SNS_TOPIC_ARN เปลี่ยนครบ + Principal มี s3.amazonaws.com" }
     ]},
     { num: 60, task: "Task 3.2", desc: "กด Save changes", errors: [
@@ -120,10 +126,13 @@ const lab5Data = {
     { num: 62, task: "Task 4.1", desc: "กด Create function", errors: [] },
     { num: 63, task: "Task 4.1", desc: "เลือก Author from scratch", errors: [] },
     { num: 64, task: "Task 4.1", desc: "ตั้งค่า: Function name=CreateThumbnail, Runtime=Python 3.12, Expand Additional settings → เปิด Custom execution role toggle → เลือก Execution role ที่ชื่อคล้าย XXXXX-LabExecutionRole-XXXXX → กด Save", errors: [
+      { problem: "เลือก Python version ผิด → function ย่อรูปไม่ทำงาน (upload รูปแล้วไม่มีอะไรเกิดขึ้น)", cause: "lab มี Caution เตือนไว้เองว่าต้องเลือก Python 3.12 เพราะ code ที่ให้มาถูกทำมาสำหรับเวอร์ชันนี้เท่านั้น ถ้าใช้เวอร์ชันเก่ากว่า code จะทำงานไม่ถูกต้อง function จึง fail เงียบๆ — จะเห็นแค่ folder thumbnail/ กับ mobile/ ว่าง (ข้อ 129 กับ ข้อ 130)", fix: "สาเหตุที่คนเลือกผิดบ่อย: Python 3.12 ไม่ได้อยู่ในกลุ่มบนสุดของ dropdown — ต้องเลื่อนไปหาในกลุ่ม Other supported\nแก้ได้ไม่ต้องสร้าง function ใหม่: Lambda → เลือก function → tab Code → เลื่อนลงล่างสุดไปที่ Runtime settings → กด Edit → เปลี่ยน Runtime เป็น Python 3.12 → Save\nแก้แล้ว upload รูปใหม่เข้า ingest/ อีกครั้ง (ข้อ 113) แล้วดู CloudWatch logs ว่า error หายไหม (ข้อ 121)\nเช็คทั้ง 2 function: CreateThumbnail กับ CreateMobileImage (ข้อ 88)" },
+      { problem: "อยากเปลี่ยน Runtime แต่หาที่เปลี่ยนไม่เจอ", cause: "หน้า Create function เปลี่ยนได้ตอนสร้าง แต่ถ้าสร้างไปแล้วช่อง Runtime ไม่ได้อยู่ด้านบนของหน้า function", fix: "เข้าไปที่ function → tab Code → เลื่อนลงล่างสุด จะเจอกล่อง Runtime settings → กด Edit ที่มุมขวาของกล่องนั้น → เปลี่ยน Runtime แล้ว Save (ที่เดียวกับที่ตั้ง Handler ในข้อ 76)" },
       { problem: "ไม่เห็น LabExecutionRole ใน dropdown", cause: "ไม่ได้ expand Additional settings หรือ ไม่ได้เปิด Custom execution role toggle", fix: "ต้อง Expand Additional settings ก่อน → เปิด toggle Custom execution role → เลือก Execution role → จะเห็น XXXXX-LabExecutionRole-XXXXX" },
       { problem: "เลือก Runtime ผิด (ไม่ใช่ Python 3.12)", cause: "Code ใน lab เขียนสำหรับ Python 3.12 โดยเฉพาะ ถ้าเลือก version อื่นอาจ error", fix: "เลือก Python 3.12 ใต้ Other supported runtimes (ไม่ใช่ Python 3.13 หรือ version อื่น)" }
     ]},
     { num: 65, task: "Task 4.1", desc: "กด Create function", errors: [
+      { problem: "กด Create function แล้วสร้างไม่ได้", cause: "จุดที่พลาดบ่อยสุดคือ execution role — ถ้าไม่เปิด Custom execution role toggle Lambda จะพยายามสร้าง role ใหม่ให้ ซึ่ง lab ไม่ได้ให้ permission สร้าง IAM role จึงถูกปฏิเสธ", fix: "ย้อนไปข้อ 64 → expand Additional settings → เปิด Custom execution role → เลือก role ที่ชื่อมีคำว่า LabExecutionRole → แล้วกด Create function อีกครั้ง\nถ้ายังไม่ผ่าน ให้อ่าน error ที่ขึ้นแล้วเช็ค: Function name ซ้ำกับที่มีอยู่แล้วไหม | Runtime เลือกแล้วหรือยัง" },
       { problem: "เจอ error 'Function already exists with name CreateThumbnail'", cause: "มี function ชื่อนี้อยู่แล้ว (อาจสร้างซ้ำ)", fix: "ถ้าสร้างไปแล้ว ไม่ต้องสร้างใหม่ — ไปที่ Lambda → Functions → กดชื่อ CreateThumbnail แล้วทำต่อข้อ 66" },
       { problem: "เจอ error 'Role does not exist' หรือ permission error", cause: "ไม่ได้เลือก LabExecutionRole ที่ข้อ 64 (อาจใช้ default role ซึ่ง lab ไม่มี permission สร้าง)", fix: "ย้อนข้อ 64: Expand Additional settings → เปิด Custom execution role → เลือก XXXXX-LabExecutionRole-XXXXX" }
     ]},
@@ -147,8 +156,11 @@ const lab5Data = {
       { problem: "Copy URL ของ CreateMobileImage มาใส่แทน CreateThumbnail (สลับกัน)", cause: "Lab ด้านซ้ายมี 2 URLs — CreateThumbnailZIPLocation กับ CreateMobileImageZIPLocation ต้องใช้ให้ถูกตัว", fix: "ข้อนี้ต้องใช้ CreateThumbnailZIPLocation (สำหรับ CreateThumbnail function) | ข้อ 100 ถึงจะใช้ CreateMobileImageZIPLocation" }
     ]},
     { num: 74, task: "Task 4.2", desc: "กด Save (Update)", errors: [] },
-    { num: 75, task: "Task 4.2", desc: "ดู code ที่ upload มา (ไม่ต้องแก้ไข)", errors: [] },
+    { num: 75, task: "Task 4.2", desc: "ดู code ที่ upload มา (ไม่ต้องแก้ไข)", errors: [
+      { problem: "copy โค้ดตัวอย่างจากเอกสารไปวางใน editor เอง แทนที่จะ upload zip", cause: "lab มี Caution เตือนไว้เองว่าโค้ดที่แสดงในเอกสารเป็นแค่ตัวอย่างให้ดูว่าใน zip มีอะไร ห้าม copy ไปใช้ | ถ้าวางโค้ดเองจะขาด library Pillow ที่ใช้ย่อรูป เพราะ Pillow ถูกแพ็กมาใน zip ไม่ได้ติดตั้งอยู่ใน Lambda runtime", fix: "ต้องได้โค้ดมาจากการ upload zip เท่านั้น (ข้อ 72 ถึง ข้อ 74) ไม่ต้องพิมพ์หรือแก้โค้ดเลย\nอาการถ้าวางโค้ดเอง: CloudWatch logs จะขึ้น error ตอน import Pillow / PIL หา module ไม่เจอ (ข้อ 121)\nวิธีแก้: กด Update from a file in Amazon S3 แล้ว paste ค่า ZIP location ที่ lab ให้มาใหม่ ระบบจะทับโค้ดเดิมทั้งหมด" }
+    ]},
     { num: 76, task: "Task 4.2", desc: "ที่ Runtime settings กด Edit → ใส่ Handler=CreateThumbnail.handler → กด Save", errors: [
+      { problem: "ใส่ Handler ผิด หรือลืมแก้จากค่า default (lambda_function.lambda_handler)", cause: "lab มี Caution เตือนไว้เองว่าถ้า Handler ไม่ตรงกับค่าที่กำหนด Lambda จะหา function ไม่เจอ | ค่า default ที่ Lambda ใส่มาให้คือ lambda_function.lambda_handler ซึ่งไม่ตรงกับชื่อไฟล์ใน zip ที่ upload มา", fix: "ต้องเป็น CreateThumbnail.handler เท่านั้น (ชื่อไฟล์ จุด ชื่อฟังก์ชัน) — ของ CreateMobileImage ใช้ CreateMobileImage.handler (ข้อ 99)\nอาการที่จะเจอถ้าใส่ผิด: upload รูปแล้วไม่มีอะไรเกิดขึ้น และ CloudWatch logs จะขึ้น error ว่าหา handler ไม่เจอ (ข้อ 121)\nแก้ได้ตลอดที่ tab Code → Runtime settings → Edit ไม่ต้องสร้าง function ใหม่" },
       { problem: "Lambda function ไม่ทำงาน (error 'Unable to import module' หรือ 'Handler not found')", cause: "Handler ใส่ผิด — ต้องเป็น CreateThumbnail.handler (ชื่อไฟล์.ชื่อ function)", fix: "ไปที่ Runtime settings → Edit → Handler=CreateThumbnail.handler (ตรงตัว case sensitive)" },
       { problem: "ใส่ Handler เป็น createthumbnail.handler (ตัวเล็กทั้งหมด)", cause: "Handler name เป็น case sensitive — ต้องตรงกับชื่อไฟล์ .py ที่ upload มา ซึ่งชื่อ CreateThumbnail.py", fix: "Handler ต้องเป็น CreateThumbnail.handler (C ตัวใหญ่, T ตัวใหญ่) — match กับชื่อไฟล์ CreateThumbnail.py" },
       { problem: "ใส่ Handler เป็น CreateThumbnail.lambda_handler (เพิ่ม lambda_ ข้างหน้า)", cause: "หลาย Lambda tutorial ใช้ lambda_handler แต่ code ของ lab นี้ใช้แค่ handler", fix: "ใส่ CreateThumbnail.handler (ไม่ใช่ lambda_handler) — ดูชื่อ function ในcode ที่ upload มาจะเห็น def handler(event, context)" }
@@ -214,7 +226,9 @@ const lab5Data = {
       { problem: "Download ไฟล์มาแล้วชื่อเป็น InputFile.jpg.jpg (ซ้อน extension)", cause: "Windows ซ่อน extension อยู่ → พอ rename เพิ่ม .jpg ก็ซ้อนกัน", fix: "เปิด File Explorer → View → ติ๊ก File name extensions → จะเห็น extension จริง แล้ว rename ให้เหลือ .jpg เดียว" },
       { problem: "ใช้ไฟล์ .png แทน .jpg", cause: "S3 event notification filter ตั้ง suffix=.jpg เท่านั้น — .png จะไม่ trigger event", fix: "ต้องใช้ไฟล์ .jpg เท่านั้น | Download รูปจาก lab instruction ที่เป็น .jpg หรือ convert รูปเป็น .jpg ก่อน upload" }
     ]},
-    { num: 109, task: "Task 5", desc: "ตรวจว่าชื่อไฟล์ที่ download มาลงท้ายด้วย .jpg (ไม่ใช่ .jpeg หรือ .png) ถ้าไม่ใช่ให้ rename", errors: [] },
+    { num: 109, task: "Task 5", desc: "ตรวจว่าชื่อไฟล์ที่ download มาลงท้ายด้วย .jpg (ไม่ใช่ .jpeg หรือ .png) ถ้าไม่ใช่ให้ rename", errors: [
+      { problem: "upload รูปเข้า ingest/ แล้วไม่มีอะไรเกิดขึ้นเลย — ไม่มี log ไม่มีรูปย่อ", cause: "ไฟล์ลงท้าย .jpeg ไม่ใช่ .jpg | event notification ตั้ง Suffix เป็น .jpg ไว้ (ข้อ 57) ดังนั้น .jpeg จะไม่ตรงเงื่อนไข S3 จึงไม่ยิง event ออกมาเลย — ไม่ใช่ Lambda พัง แต่ไม่มีอะไรมาปลุก Lambda ตั้งแต่ต้น", fix: "lab เตือนไว้เฉพาะเจาะจงว่า **ผู้ใช้ Firefox** ต้องระวัง เพราะ Firefox มักบันทึกไฟล์เป็น .jpeg ให้อัตโนมัติ\nวิธีแก้: rename ไฟล์ในเครื่องให้ลงท้าย .jpg แล้ว upload ใหม่ (ข้อ 113)\nไฟล์ที่ upload ผิดนามสกุลไปแล้วลบทิ้งได้เลย ไม่กระทบอะไร\nอีกจุดที่ต้องตรงคือต้อง upload เข้า folder ingest/ เท่านั้น (ข้อ 112) เพราะ Prefix ตั้งเป็น ingest/ ไว้" }
+    ]},
     { num: 110, task: "Task 5", desc: "ค้นหา S3 ใน search bar", errors: [] },
     { num: 111, task: "Task 5", desc: "กดชื่อ bucket xxxxx-labbucket-xxxxx", errors: [] },
     { num: 112, task: "Task 5", desc: "กดเข้า folder ingest/", errors: [
@@ -239,7 +253,9 @@ const lab5Data = {
     { num: 122, task: "Task 6", desc: "เลือก Log stream ล่าสุด (เรียงตาม Last event time)", errors: [
       { problem: "ไม่เห็น Log stream ใดๆ", cause: "Lambda ไม่ได้ถูก invoke เลย — event notification chain มีปัญหาตรงไหนสักจุด", fix: "ย้อนเช็คตาม flow: S3 event → SNS → SQS → Lambda trigger | ดูข้อ 117 สำหรับ checklist" }
     ]},
-    { num: 123, task: "Task 6", desc: "Expand log messages ดูรายละเอียด (RequestId, Duration, Memory) ของ CreateThumbnail", errors: [] },
+    { num: 123, task: "Task 6", desc: "Expand log messages ดูรายละเอียด (RequestId, Duration, Memory) ของ CreateThumbnail", errors: [
+      { problem: "เห็น log ว่า Lambda ถูกเรียกหลายรอบ และบางรอบมี error — คิดว่าตั้งค่าผิด", cause: "ไม่ใช่ error ที่ต้องแก้ — lab อธิบายไว้เองว่าจะเห็น log หลายชุดเป็นเรื่องปกติ เพราะมีสิ่งมาปลุก Lambda หลายครั้ง: (1) test message ที่ publish ไปที่ topic ตอน Task 2 (ข้อ 35) (2) ตอนสร้าง event notification ให้ bucket (ข้อ 60) (3) ตอน upload รูปจริง (ข้อ 116)", fix: "ให้ดูเฉพาะ log stream ล่าสุดที่เกิดตอน upload รูป (ข้อ 122) — รอบนั้นต้องสำเร็จ\nรอบเก่าๆ ที่มาจาก test message จะ error เป็นปกติ เพราะข้อความนั้นไม่ใช่ payload ของ S3 event ที่ code คาดหวัง จึงหา key ของรูปไม่เจอ\nตัวชี้ขาดว่าผ่านหรือไม่คือมีรูปย่ออยู่ใน folder thumbnail/ กับ mobile/ จริงหรือเปล่า (ข้อ 129 กับ ข้อ 130) ไม่ใช่ว่าไม่มี error ใน log เลย" }
+    ]},
     { num: 124, task: "Task 6", desc: "กลับไปหน้า Lambda Functions แล้วกดเลือก function CreateMobileImage", errors: [] },
     { num: 125, task: "Task 6", desc: "เลือก tab Monitor → กด View CloudWatch logs → เลือก Log stream ล่าสุด", errors: [
       { problem: "CreateMobileImage ไม่มี Log stream แต่ CreateThumbnail มี", cause: "CreateMobileImage ไม่ได้ถูก trigger — อาจผูก trigger ผิด queue หรือ mobile-queue ไม่ได้ subscribe กับ SNS", fix: "เช็ค: Lambda CreateMobileImage → Configuration → Triggers → ต้องเห็น SQS mobile-queue | เช็ค SQS mobile-queue → SNS subscriptions → ต้องเห็น resize-image-topic" }

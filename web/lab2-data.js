@@ -12,6 +12,7 @@ const lab2Data = {
     ]},
     { num: 4, task: "Task 1", desc: "ที่เมนูด้านซ้าย เลือก Your VPCs", errors: [] },
     { num: 5, task: "Task 1", desc: "กด Create VPC ตั้งค่า: Resources=VPC only, Name tag=Lab VPC, IPv4 CIDR=10.0.0.0/16", errors: [
+      { problem: "เลือก Resources to create เป็น VPC and more (ใช้ VPC Wizard) แทน VPC only", cause: "lab instruction เตือนไว้เองว่า console มี VPC Wizard ที่สร้างสถาปัตยกรรมให้อัตโนมัติ แต่ lab นี้ให้สร้างส่วนประกอบเองทีละชิ้น | ถ้าใช้ wizard ระบบจะสร้าง subnet, route table, IGW, NAT ให้เองพร้อมตั้งชื่ออัตโนมัติ ซึ่งไม่ตรงกับชื่อที่ lab กำหนด ทำให้ข้อถัดๆ ไปหา resource ไม่เจอทั้งหมด", fix: "ต้องเลือก Resources to create = VPC only เท่านั้น\nถ้าเผลอใช้ wizard ไปแล้ว: ไปลบ resource ที่ wizard สร้างให้ออก (subnet, route table, IGW, NAT gateway ที่ไม่ได้ใช้) แล้วเริ่ม Task 1 ใหม่ด้วย VPC only — อย่าปล่อยไว้เพราะจะสับสนกับของที่สร้างเองว่าอันไหนคืออันไหน\nสังเกตง่ายๆ ว่าใช้ wizard ไป: จะมี subnet และ route table โผล่มาเองก่อนที่จะถึงข้อ 12" },
       { problem: "สร้าง VPC ผิดแล้วจะ delete ไม่ได้", cause: "Lab ไม่มี permission ให้ delete VPC", fix: "ไม่ต้อง delete VPC เดิม — สร้าง VPC ใหม่ที่ถูกต้องได้เลย แล้วใช้อันใหม่แทน (เลือกให้ถูกตัวในขั้นตอนถัดไป)" }
     ]},
     { num: 6, task: "Task 1", desc: "กด Create VPC จะเห็น success message", errors: [] },
@@ -24,6 +25,7 @@ const lab2Data = {
     { num: 10, task: "Task 1", desc: "กด Save", errors: [] },
     { num: 11, task: "Task 2.1", desc: "ที่เมนูด้านซ้าย เลือก Subnets", errors: [] },
     { num: 12, task: "Task 2.1", desc: "กด Create subnet ตั้งค่า: VPC ID=Lab VPC, Subnet name=Public Subnet, Availability Zone=เลือกอันแรกในลิสต์, IPv4 CIDR=10.0.0.0/24", errors: [
+      { problem: "เลือก Availability Zone เป็น No Preference", cause: "lab instruction สั่งห้ามเลือก No Preference ไว้ชัดเจน — ถ้าเลือก AWS จะสุ่ม AZ ให้ ทำให้ Public Subnet กับ Private Subnet (ข้อ 19) อาจไปอยู่คนละ AZ ซึ่งจะทำให้ traffic ระหว่าง instance ข้าม AZ และผิดจากที่ lab ออกแบบไว้", fix: "ต้องเลือก AZ ตัวแรกในลิสต์ให้เป็นตัวเลือกที่ระบุจริง ไม่ใช่ No Preference\nสำคัญ: Private Subnet ที่ข้อ 19 ต้องเลือก AZ เดียวกันกับ Public Subnet — จดไว้ว่าเลือกอะไรไป\nถ้าสร้างผิดไปแล้ว: VPC → Subnets → ลบ subnet นั้น แล้วสร้างใหม่ (AZ ของ subnet แก้ย้อนหลังไม่ได้)" },
       { problem: "เจอ error 'The CIDR block is the same as the VPC CIDR block'", cause: "ใส่ CIDR เป็น 10.0.0.0/16 ซึ่งเท่ากับ VPC ทั้งก้อน", fix: "แก้ CIDR เป็น 10.0.0.0/24 (subnet ต้องเล็กกว่า VPC)" },
       { problem: "สร้าง subnet สำเร็จแต่ไม่เห็นใน Lab VPC ตอนทำข้อถัดไป", cause: "VPC ID dropdown จะ default เป็น VPC แรกในลิสต์ ซึ่งอาจเป็น default VPC ไม่ใช่ Lab VPC — ต้องเลือก Lab VPC ให้ถูกก่อนกรอกข้อมูลอื่น", fix: "ตรวจว่าเลือก VPC ID เป็น Lab VPC (ไม่ใช่ default VPC) ก่อนกด Create | ถ้าสร้างไปแล้วผิด VPC ให้ delete subnet แล้วสร้างใหม่เลือก Lab VPC" }
     ]},
@@ -31,9 +33,13 @@ const lab2Data = {
     { num: 14, task: "Task 2.1", desc: "ตรวจ State ต้องเป็น Available", errors: [] },
     { num: 15, task: "Task 2.1", desc: "เลือก (ติ๊ก) Public Subnet", errors: [] },
     { num: 16, task: "Task 2.1", desc: "กด Actions แล้วเลือก Edit subnet settings", errors: [] },
-    { num: 17, task: "Task 2.1", desc: "ในส่วน Auto-assign IP settings ให้ติ๊ก Enable auto-assign public IPv4 address แล้วกด Save", errors: [] },
+    { num: 17, task: "Task 2.1", desc: "ในส่วน Auto-assign IP settings ให้ติ๊ก Enable auto-assign public IPv4 address แล้วกด Save", errors: [
+      { problem: "ลืมติ๊ก Enable auto-assign public IPv4 — เจอตอนหลังว่าเข้าเว็บไม่ได้", cause: "ถ้า subnet ไม่ได้เปิด auto-assign public IP instance ที่ launch ใน subnet นี้จะไม่มี Public IP ทำให้เข้าจากอินเทอร์เน็ตไม่ได้ (ข้อ 75)", fix: "ตัว subnet แก้ย้อนหลังได้: VPC → Subnets → ติ๊ก Public Subnet → Actions → Edit subnet settings → ติ๊ก Enable auto-assign public IPv4 address → Save\nแต่ instance ที่ launch ไปก่อนหน้านั้นจะไม่ได้ IP ย้อนหลัง — ต้องดูที่ข้อ 60 ว่าตอน launch ตั้ง Auto-assign public IP = Enable ไว้หรือยัง ถ้าไม่ ให้ terminate แล้ว launch ใหม่" },
+      { problem: "ผู้เรียนถาม: ตั้งชื่อ Public Subnet แล้ว ทำไมยังใช้งานจากอินเทอร์เน็ตไม่ได้", cause: "ไม่ใช่ error — lab instruction อธิบายไว้ว่าแม้ตั้งชื่อว่า Public Subnet แต่ตอนนี้ยังไม่ใช่ public subnet จริง | subnet จะเป็น public ได้ต้องมี Internet Gateway และมี route ชี้ไป IGW ก่อน ซึ่งยังไม่ได้ทำในขั้นนี้", fix: "อธิบายว่าชื่อเป็นแค่ป้าย ยังต้องทำอีก 2 อย่างถึงจะ public จริง: สร้างและ attach Internet Gateway (ข้อ 23 ถึง ข้อ 27) แล้วเพิ่ม route 0.0.0.0/0 ไป IGW ใน route table และ associate Public Subnet เข้ากับ route table นั้น (ข้อ 34 กับ ข้อ 38)\nถ้าผู้เรียนลองเปิดเว็บตอนนี้แล้วไม่ขึ้น เป็นเรื่องปกติ ยังไม่ถึงขั้นนั้น" }
+    ]},
     { num: 18, task: "Task 2.1", desc: "กด Save", errors: [] },
     { num: 19, task: "Task 2.2", desc: "กด Create subnet ตั้งค่า: VPC ID=Lab VPC, Subnet name=Private Subnet, Availability Zone=เลือกอันแรกในลิสต์, IPv4 CIDR=10.0.2.0/23", errors: [
+      { problem: "Private Subnet ไปอยู่คนละ AZ กับ Public Subnet หรือเลือก No Preference", cause: "lab สั่งให้เลือก AZ ตัวแรกในลิสต์ทั้งสอง subnet และห้ามเลือก No Preference — ถ้า Private ไปอยู่คนละ AZ กับ Public traffic จะข้าม AZ และผิดจากที่ lab ออกแบบไว้", fix: "เลือก AZ เดียวกันกับที่ใช้ตอนสร้าง Public Subnet (ข้อ 12) — ถ้าจำไม่ได้ไปดูที่ VPC → Subnets ดูคอลัมน์ Availability Zone ของ Public Subnet\nAZ ของ subnet แก้ย้อนหลังไม่ได้ ถ้าผิดต้องลบ subnet แล้วสร้างใหม่" },
       { problem: "เจอ error 'The CIDR block conflicts with another subnet' หรือ 'overlaps'", cause: "ใส่ CIDR ที่ overlap กับ Public Subnet เช่น 10.0.0.0/23 (ซึ่งครอบ 10.0.0.0-10.0.1.255)", fix: "ใส่ 10.0.2.0/23 ซึ่งครอบ 10.0.2.0-10.0.3.255 จะไม่ overlap กับ Public Subnet" },
       { problem: "VPC ID ไม่ได้เลือกเป็น Lab VPC (ลืมเปลี่ยน หรือ dropdown reset กลับเป็น default)", cause: "เมื่อเปิดหน้า Create subnet ใหม่ VPC ID จะ reset เป็น VPC แรกในลิสต์ทุกครั้ง", fix: "ทุกครั้งที่สร้าง subnet ใหม่ ต้องเลือก VPC ID=Lab VPC ก่อนกรอกข้อมูลอื่นๆ เสมอ" }
     ]},
@@ -80,6 +86,7 @@ const lab2Data = {
     { num: 46, task: "Task 6.1", desc: "เลือก Dashboard จากเมนูด้านซ้าย", errors: [] },
     { num: 47, task: "Task 6.1", desc: "ในส่วน Launch instance กด Launch instances", errors: [] },
     { num: 48, task: "Task 6.2", desc: "ในส่วน Name and tags ใส่ Name=Public Instance (ต้องตรงตัว เป็น case sensitive)", errors: [
+      { problem: "ทำไม Name tag ต้องตรงตัวเป๊ะ (ผู้เรียนมักถาม หรือมองข้าม)", cause: "lab instruction ระบุเหตุผลไว้เอง: สิทธิ์ที่ lab ให้มาอนุญาต SSM เฉพาะ instance ที่มี tag ตรงตามที่กำหนด — ชื่อ tag จึงไม่ใช่แค่ป้ายกำกับ แต่เป็นเงื่อนไขของสิทธิ์", fix: "ต้องเป็น Public Instance เท่านั้น — P ตัวใหญ่ I ตัวใหญ่ เว้นวรรค 1 ครั้ง\nถ้าตั้งผิด ปุ่ม Connect ของ Session Manager จะกดไม่ได้ทั้งที่ instance state=Running ปกติ (ข้อ 81) ทำให้ไล่หาผิดทางไปที่ network หรือ IAM\nแก้ tag ย้อนหลังได้: tab Tags → Manage tags → แก้ Name → Save → รอ 2-3 นาที | lab ไม่ต้องใส่ tag อื่นเพิ่ม" },
       { problem: "Session Manager connect ไม่ได้ในภายหลัง (ข้อ 82)", cause: "ชื่อ instance ไม่ตรง — lab ใช้ Name tag เพื่อ assign IAM permissions ผ่าง tag-based policy ดังนั้น ถ้าชื่อผิด (เช่น public instance, PublicInstance, Public_Instance) จะไม่มี permission", fix: "Name ต้องเป็น 'Public Instance' ตรงตัว: P ตัวใหญ่, I ตัวใหญ่, มีเว้นวรรค 1 ช่อง | ถ้าใส่ผิด ให้แก้ Name tag ที่ EC2 → Instances → เลือก instance → Tags tab → Edit" }
     ]},
     { num: 49, task: "Task 6.2", desc: "(ช่อง Name)", errors: [] },
@@ -111,12 +118,14 @@ const lab2Data = {
     { num: 63, task: "Task 6.9", desc: "กด expand ส่วน Advanced details", errors: [] },
     { num: 64, task: "Task 6.9", desc: "ที่ IAM instance profile เลือก EC2InstProfile จาก dropdown", errors: [
       { problem: "ไม่เห็น EC2InstProfile ใน dropdown", cause: "ต้อง scroll dropdown ลงไปเพราะอาจมีหลาย role | หรือพิมพ์ 'EC2' ใน search ของ dropdown", fix: "พิมพ์ EC2 ในช่อง search ของ IAM instance profile dropdown → จะเห็น EC2InstProfile ปรากฏ" },
-      { problem: "ข้ามขั้นตอนนี้ไป (ไม่ได้เลือก IAM role) → Session Manager connect ไม่ได้ (ข้อ 82)", cause: "IAM instance profile จำเป็นสำหรับ SSM Agent ในการ register กับ AWS Systems Manager", fix: "ถ้า launch ไปแล้วโดยไม่มี IAM role → terminate instance → launch ใหม่โดยเลือก EC2InstProfile ที่ Advanced details" }
+      { problem: "ข้ามขั้นตอนนี้ไป (ไม่ได้เลือก IAM role) → Session Manager connect ไม่ได้ (ข้อ 82)", cause: "IAM instance profile จำเป็นสำหรับ SSM Agent ในการ register กับ AWS Systems Manager", fix: "terminate instance → launch ใหม่โดยเลือก EC2InstProfile ที่ Advanced details — วิธีนี้ชัวร์สุด\nลอง Modify IAM role ก่อนก็ได้ (เลือก instance → tab Security → Actions → Security → Modify IAM role) แต่ lab จำกัด permission ของ EC2 ไว้ มักติด AccessDenied ถ้าติดให้ terminate แล้ว launch ใหม่เลย ไม่ต้องเสียเวลาไล่" },
+      { problem: "แก้ IAM role ไม่ได้ / กด Modify IAM role แล้วขึ้น AccessDenied หรือ not authorized", cause: "lab ให้ permission มาแบบจำกัด — action ที่แก้ instance ที่สร้างแล้ว (เช่น modify IAM role, stop/start บาง action) ถูกปิดไว้ ไม่ใช่ความผิดของผู้เรียน", fix: "อย่าไล่แก้ต่อ — terminate instance นั้นแล้ว launch ใหม่ให้ครบทุกค่าตั้งแต่แรก (ข้อ 59 ถึง ข้อ 65)\nก่อน launch ใหม่ให้ไล่เช็คให้ครบรอบเดียว: VPC + Subnet (ข้อ 59), Auto-assign public IP (ข้อ 60), Public SG (ข้อ 62), IAM instance profile, User data (ข้อ 65)" }
     ]},
     { num: 65, task: "Task 6.9", desc: "ที่ User data ให้ paste script ที่ lab ให้มา (install Apache web server)", errors: [
       { problem: "Web server ไม่ทำงาน — ข้อ 76 เปิด web page ไม่ได้ (Connection Refused)", cause: "User data ไม่ได้ถูก execute — อาจ paste ไม่ครบ ไม่มี #!/bin/bash ข้างบน หรือ copy มาจาก Word/PDF ทำให้มี hidden characters", fix: "User data ต้องขึ้นต้นด้วย #!/bin/bash (บรรทัดแรก) | Copy จาก lab page โดยตรง ไม่ใช่จาก Word/PDF | ถ้า launch ไปแล้ว ใช้ Session Manager เข้าไป run script manually: sudo yum install -y httpd && sudo systemctl start httpd" },
       { problem: "Paste user data แล้วมี smart quotes หรือ em dashes ปน", cause: "Copy จาก PDF หรือ Word ทำให้ straight quotes กลายเป็น curly quotes และ hyphens กลายเป็น em dashes", fix: "Copy จาก lab page (HTML) โดยตรง | หรือ paste ลงใน plain text editor ก่อนแล้ว copy อีกที | ตรวจว่า quotes เป็น straight quotes" },
-      { problem: "User data box ว่างเปล่าเพราะลืม paste", cause: "ข้ามไปกด Launch เลยโดยไม่ได้ใส่ user data", fix: "ถ้า launch ไปแล้ว: terminate instance → launch ใหม่โดยใส่ user data ก่อนกด Launch | หรือ SSM เข้าไป run script manually" }
+      { problem: "User data box ว่างเปล่าเพราะลืม paste", cause: "ข้ามไปกด Launch เลยโดยไม่ได้ใส่ user data", fix: "อันนี้กู้ได้ไม่ต้อง terminate เพราะเป็นการรันคำสั่งใน OS ไม่ใช่ AWS API จึงไม่ติด permission ของ lab:\nConnect → Session Manager → sudo su → รัน script ที่ lab ให้มาทีละบรรทัด → เปิดเว็บใหม่ (ข้อ 75)\nเงื่อนไข: ต้องมี IAM instance profile อยู่แล้วถึงจะ SSM เข้าได้ (ข้อ 64) — ถ้าลืมทั้ง IAM ทั้ง user data ก็เข้าไปแก้ไม่ได้ ต้อง terminate แล้ว launch ใหม่" },
+      { problem: "User data ใส่แล้วแต่เว็บยังไม่ขึ้น — อยากรัน script เองแทนที่จะ launch ใหม่", cause: "user data รันแค่ครั้งเดียวตอน boot แรก ถ้าตอนนั้น fail จะไม่รันซ้ำเอง", fix: "Connect → Session Manager → พิมพ์ sudo su เพื่อเป็น root → paste script จาก lab page ให้ครบทุกบรรทัด → กลับไปเปิดเว็บใหม่ (ข้อ 75)\nสำคัญ: script ของ lab ทำ 3 อย่าง ไม่ใช่แค่ลง httpd — (1) yum install httpd พร้อม php8.1 (2) enable + start httpd (3) cd /var/www/html แล้ว wget ไฟล์ instanceData.zip มา unzip เป็นหน้าเว็บ\nถ้าลงแค่ httpd จะได้หน้า Apache เปล่า และถ้าลืม php8.1 หน้าที่แสดง instance ID กับ AZ จะไม่ทำงาน — ต้อง copy script จาก lab page มาทั้งก้อน\nดู log ว่า user data พังตรงไหนได้ที่ sudo cat /var/log/cloud-init-output.log" }
     ]},
     { num: 66, task: "Task 6.10", desc: "ดูส่วน Summary ตรวจว่าค่าถูกต้อง", errors: [] },
     { num: 67, task: "Task 6.10", desc: "กด Launch instance", errors: [
@@ -125,7 +134,7 @@ const lab2Data = {
       { problem: "กด Launch แล้วเจอ error เรื่อง Security Group", cause: "Security Group อยู่คนละ VPC กับ Subnet ที่เลือก", fix: "ตรวจว่า Network settings เลือก Lab VPC แล้ว SG ที่เลือกก็ต้องอยู่ใน Lab VPC เช่นกัน (ข้อ 62)" }
     ]},
     { num: 68, task: "Task 6.10", desc: "กด View all instances", errors: [] },
-    { num: 69, task: "Task 6.10", desc: "รอจน Public Instance แสดง Instance state=Running และ Status check=2/2 checks passed", errors: [
+    { num: 69, task: "Task 6.10", desc: "รอจน Public Instance แสดง Instance state=Running และ Status check=3/3 checks passed", errors: [
       { problem: "Instance ค้างอยู่ที่ Pending นานมาก", cause: "ปกติใช้เวลา 1-2 นาที ถ้านานกว่านั้นอาจมี issue กับ resource", fix: "รอ 2-3 นาที + กด refresh | ถ้านานเกิน 5 นาทียัง Pending → terminate แล้ว launch ใหม่" },
       { problem: "Status check 1/2 หรือ fail", cause: "Instance ยังบูตไม่เสร็จ หรือ network config มีปัญหา", fix: "รอ 3-5 นาที กด refresh | ถ้ายังไม่ผ่าน → terminate + launch ใหม่ตรวจว่า subnet/VPC ถูกต้อง" }
     ]},
@@ -138,7 +147,7 @@ const lab2Data = {
     ]},
     { num: 74, task: "Task 7", desc: "Copy ค่า Public IPv4 DNS (อย่ากด link 'open address' เพราะมันจะใช้ HTTPS)", errors: [] },
     { num: 75, task: "Task 7", desc: "เปิด browser tab ใหม่ วาง DNS ที่ copy มาโดยใช้ http:// ข้างหน้า ต้องเห็น web page ของ instance", errors: [
-      { problem: "ERR_CONNECTION_TIMED_OUT หรือ web page ไม่แสดงเลย", cause: "มีหลายสาเหตุที่เป็นไปได้ ต้องเช็คทีละจุดตามลำดับ", fix: "เช็คตามลำดับ:\n1. Instance state เป็น Running และ 2/2 checks passed? (ข้อ 69)\n2. Instance มี Public IPv4 address?\n3. Security Group มี Inbound rule HTTP port 80? (ข้อ 42)\n4. Route table มี route 0.0.0.0/0 ไปหา Internet Gateway? (ข้อ 34)\n5. Internet Gateway ถูก Attach กับ Lab VPC? (ข้อ 25)\n6. Public Subnet ถูก associate กับ Public Route Table? (ข้อ 38)\n7. URL ใช้ http:// ไม่ใช่ https://?" },
+      { problem: "ERR_CONNECTION_TIMED_OUT หรือ web page ไม่แสดงเลย", cause: "มีหลายสาเหตุที่เป็นไปได้ ต้องเช็คทีละจุดตามลำดับ", fix: "เช็คตามลำดับ:\n1. Instance state เป็น Running และ 3/3 checks passed? (ข้อ 69)\n2. Instance มี Public IPv4 address?\n3. Security Group มี Inbound rule HTTP port 80? (ข้อ 42)\n4. Route table มี route 0.0.0.0/0 ไปหา Internet Gateway? (ข้อ 34)\n5. Internet Gateway ถูก Attach กับ Lab VPC? (ข้อ 25)\n6. Public Subnet ถูก associate กับ Public Route Table? (ข้อ 38)\n7. URL ใช้ http:// ไม่ใช่ https://?" },
       { problem: "ERR_CONNECTION_REFUSED", cause: "Web server (httpd) ไม่ได้ทำงาน เพราะ user data script ไม่ได้ถูกใส่หรือ run ไม่สำเร็จ", fix: "ใช้ Session Manager เข้าไปใน instance แล้ว run: sudo systemctl start httpd | ถ้าไม่เจอ httpd แสดงว่า user data ไม่ได้ใส่ (ข้อ 65) หรือเลือก AMI ผิด (ข้อ 52)" },
       { problem: "ERR_SSL_PROTOCOL_ERROR หรือ SSL error", cause: "ใช้ https:// แทน http:// หรือกด link 'open address' ใน console ซึ่งจะเปิดเป็น HTTPS", fix: "เปลี่ยน URL เป็น http:// (ไม่มีตัว s) เพราะ lab นี้ไม่ได้ setup SSL certificate" }
     ]},
@@ -161,6 +170,7 @@ const lab2Data = {
     { num: 86, task: "Task 9", desc: "ค้นหา VPC ใน search bar", errors: [] },
     { num: 87, task: "Task 9", desc: "ที่เมนูด้านซ้าย เลือก NAT gateways", errors: [] },
     { num: 88, task: "Task 9", desc: "กด Create NAT gateway ตั้ง Name=Lab NGW, Subnet=Public Subnet, กด Allocate Elastic IP", errors: [
+      { problem: "ตั้งค่า NAT gateway ผิด อยากแก้ทีหลัง (subnet ผิด หรือ Elastic IP ผิด)", cause: "lab instruction เตือนไว้เองว่า Elastic IP ที่ผูกกับ NAT gateway แล้วเปลี่ยนทีหลังไม่ได้ | subnet ของ NAT gateway ก็เปลี่ยนไม่ได้เช่นกัน", fix: "แก้ไม่ได้ ต้อง delete NAT gateway ตัวนั้นแล้วสร้างใหม่ให้ถูกตั้งแต่แรก\nจุดที่ต้องถูก: Subnet ต้องเป็น Public Subnet (ไม่ใช่ Private — NAT ต้องอยู่ใน public เพื่อออกเน็ตผ่าน IGW) และต้องกด Allocate Elastic IP ให้ได้ค่ามาก่อนกด Create\nหมายเหตุ: NAT gateway ที่ลบแล้วยังทิ้ง Elastic IP ค้างไว้ ถ้าสร้างใหม่ให้ Allocate ใหม่ได้เลย" },
       { problem: "เจอ error 'An Elastic IP address is required'", cause: "ไม่ได้กดปุ่ม Allocate Elastic IP ก่อนกด Create", fix: "กดปุ่ม Allocate Elastic IP ที่อยู่ข้างๆ ก่อน แล้วค่อยกด Create NAT gateway" },
       { problem: "เลือก Subnet ผิดเป็น Private Subnet", cause: "NAT Gateway ต้องอยู่ใน Public Subnet เท่านั้น เพราะมันต้อง route ผ่าน IGW ไปออก internet", fix: "ถ้าสร้างไปแล้วใน Private Subnet → delete NAT Gateway (รอจน state เป็น Deleted) → สร้างใหม่เลือก Subnet=Public Subnet" }
     ]},
@@ -189,6 +199,7 @@ const lab2Data = {
       { problem: "สร้าง Security Group แล้ว แต่ตอน launch Private Instance หาไม่เจอ", cause: "เลือก VPC ผิดตอนสร้าง (default VPC แทน Lab VPC) — VPC dropdown จะ default เป็น default VPC เสมอ", fix: "Delete SG ที่สร้างผิด แล้วสร้างใหม่ เปลี่ยน VPC เป็น Lab VPC ก่อนกด Create" }
     ]},
     { num: 103, task: "Task 10", desc: "ในส่วน Inbound rules กด Add rule เลือก Type=HTTP, Source=Custom แล้วพิมพ์ sg ในช่อง จะเห็น Public SG ให้เลือก", errors: [
+      { problem: "เข้าใจผิดว่าอ้าง Public SG เป็น Source แล้วจะได้ rule ของ Public SG มาด้วย", cause: "lab instruction อธิบายไว้ว่าการใส่ security group เป็น Source หมายถึงอนุญาต traffic ที่มาจาก network interface ของ SG นั้น โดยดูจาก private IP — ไม่ใช่การคัดลอก rule ของ SG นั้นมาใส่", fix: "อธิบายว่า Private SG ยังต้องมี rule ของตัวเองครบ: Type=HTTP, Source=Custom → เลือก Public SG\nผลลัพธ์คือ instance ที่อยู่ใน Public SG เท่านั้นที่ยิง HTTP เข้า Private Instance ได้ (ผ่าน private IP) — คนนอกจากอินเทอร์เน็ตเข้าไม่ได้ ซึ่งเป็นสิ่งที่ต้องการ\nถ้าใส่ Source เป็น Anywhere-IPv4 แทน จะผิดวัตถุประสงค์ของ lab เพราะเปิด private instance ให้ทุกคน" },
       { problem: "พิมพ์ sg แล้วไม่เห็น Public SG ใน dropdown", cause: "Security Group นี้สร้างใน VPC คนละตัวกับ Public SG (SG จะเห็นเฉพาะ SG ที่อยู่ใน VPC เดียวกัน)", fix: "ตรวจว่า Private SG ที่กำลังสร้างอยู่ เลือก VPC=Lab VPC เหมือนกับ Public SG" },
       { problem: "เลือก source ผิดเป็น Anywhere-IPv4 แทน Custom", cause: "จะทำให้ private instance รับ traffic จากทุกที่ ไม่ใช่เฉพาะจาก public instance", fix: "แก้ inbound rule: เปลี่ยน Source เป็น Custom → พิมพ์ sg → เลือก Public SG" }
     ]},
@@ -198,7 +209,9 @@ const lab2Data = {
     { num: 107, task: "Task 11.1", desc: "เลือก Dashboard จากเมนูด้านซ้าย", errors: [] },
     { num: 108, task: "Task 11.1", desc: "กด Launch instance", errors: [] },
     { num: 109, task: "Task 11.2", desc: "ในส่วน Name and tags", errors: [] },
-    { num: 110, task: "Task 11.2", desc: "ใส่ Name=Private Instance (ต้องตรงตัว เป็น case sensitive)", errors: [] },
+    { num: 110, task: "Task 11.2", desc: "ใส่ Name=Private Instance (ต้องตรงตัว เป็น case sensitive)", errors: [
+      { problem: "ตั้งชื่อ Name tag ไม่ตรงตัว (พิมพ์เล็กใหญ่ผิด, สะกดผิด, มีเว้นวรรคเกิน) → Session Manager เข้า instance นี้ไม่ได้ (ข้อ 123)", cause: "lab instruction ระบุเหตุผลไว้เอง: lab ให้สิทธิ์ SSM เฉพาะ instance ที่มี tag ตรงตามที่กำหนดเท่านั้น | ถ้าชื่อไม่ตรง instance นั้นจะหลุดจากขอบเขตสิทธิ์ ปุ่ม Connect จะกดไม่ได้หรือ error ทั้งที่ instance ทำงานปกติ", fix: "ต้องเป็น Private Instance เท่านั้น — P ตัวใหญ่ I ตัวใหญ่ เว้นวรรค 1 ครั้ง ไม่มีช่องว่างหน้า/หลัง\nแก้ tag ย้อนหลังได้ ไม่ต้อง terminate: EC2 → Instances → เลือก instance → tab Tags → Manage tags → แก้ค่า Name → Save → รอ 2-3 นาทีให้สิทธิ์ SSM มีผล แล้วลอง Connect ใหม่\nlab บอกว่าไม่ต้องใส่ tag อื่นเพิ่มเลย ใส่แค่ Name" }
+    ]},
     { num: 111, task: "Task 11.3", desc: "ในส่วน Application and OS Images", errors: [] },
     { num: 112, task: "Task 11.3", desc: "ตรวจว่าเลือก Amazon Linux", errors: [] },
     { num: 113, task: "Task 11.3", desc: "ตรวจว่าเลือก Amazon Linux 2023 AMI", errors: [] },
@@ -227,7 +240,7 @@ const lab2Data = {
       { problem: "กด Launch แล้วเจอ error เรื่อง Security Group", cause: "Security Group อยู่คนละ VPC กับ Subnet ที่เลือก", fix: "ตรวจว่า Network settings เลือก Lab VPC แล้ว SG ที่เลือกก็ต้องอยู่ใน Lab VPC เช่นกัน (ข้อ 122)" }
     ]},
     { num: 128, task: "Task 11.11", desc: "กด View all instances", errors: [] },
-    { num: 129, task: "Task 11.11", desc: "รอจน Private Instance แสดง Running + 2/2 checks passed", errors: [
+    { num: 129, task: "Task 11.11", desc: "รอจน Private Instance แสดง Running + 3/3 checks passed", errors: [
       { problem: "Instance ค้างอยู่ที่ Pending นานมาก", cause: "ปกติใช้เวลา 1-2 นาที ถ้านานกว่านั้นอาจมี issue", fix: "รอ 2-3 นาที + กด refresh | ถ้านานเกิน 5 นาที → terminate แล้ว launch ใหม่" }
     ]},
     { num: 130, task: "Task 12", desc: "ที่เมนูด้านซ้าย เลือก Instances", errors: [] },
@@ -260,6 +273,7 @@ const lab2Data = {
     ]},
     { num: 148, task: "Optional 1", desc: "ดูผลลัพธ์ของ curl command ต้องเห็น HTML ของ web page จาก Private Instance", errors: [] },
     { num: 149, task: "Optional 1", desc: "พิมพ์ ping แล้วตามด้วย Private IP (เช่น ping 10.0.2.131)", errors: [
+      { problem: "ping ไม่ผ่าน / ไม่มี response — ผู้เรียนคิดว่าตั้งค่าอะไรผิด", cause: "ไม่ใช่ error และไม่ใช่ความผิดของผู้เรียน — lab ออกแบบให้ ping ล้มเหลวตรงนี้โดยเจตนา เพื่อเป็นโจทย์ให้ไปหาเองว่าต้องเพิ่ม inbound rule แบบไหนใน Private SG | เหตุผลคือ Private SG เปิดไว้แค่ HTTP ซึ่ง ping ใช้ ICMP ไม่ใช่ HTTP จึงถูกบล็อก", fix: "อย่าไปไล่แก้ route หรือ NAT — บอกผู้เรียนว่าอันนี้คือโจทย์ ให้คิดว่า ping ใช้ protocol อะไร\nคำตอบตามเฉลยของ lab: EC2 → Security Groups → ติ๊ก Private SG → Actions → Edit inbound rules → Add rule → Type = Custom ICMP - IPv4 → Source = Custom → พิมพ์ sg แล้วเลือก Public SG → Save rules → กลับไป ping ใหม่จะผ่าน\nสังเกตว่า curl ที่ข้อ 147 ผ่านอยู่แล้ว เพราะ curl ใช้ HTTP ซึ่ง Private SG อนุญาตไว้ (ข้อ 103) — จุดนี้ยืนยันว่า network ปกติ ปัญหาอยู่ที่ protocol เท่านั้น\nlab มีส่วน Optional Task Solution อยู่ท้ายเอกสารถ้าผู้เรียนหาไม่ได้" },
       { problem: "ping ไม่ response (100% packet loss)", cause: "นี่คือ expected behavior เป็นโจทย์ของ lab — Private SG ไม่มี ICMP rule", fix: "ไปที่ Security Groups → เลือก Private SG → Edit inbound rules → Add rule → Type=Custom ICMP - IPv4, Source=Custom แล้วพิมพ์ sg เลือก Public SG → Save rules → กลับมา ping ใหม่จะ response" }
     ]},
     { num: 150, task: "Optional 1", desc: "copy คำสั่ง ping ที่ lab ให้", errors: [] },

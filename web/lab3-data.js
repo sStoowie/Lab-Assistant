@@ -15,7 +15,9 @@ const lab3Data = {
     ]},
     { num: 7, task: "Task 1", desc: "ในส่วน Templates เลือก Dev/Test", errors: [] },
     { num: 8, task: "Task 1", desc: "ในส่วน Cluster scalability type เลือก Provisioned แล้วตั้งค่า: Type of provisioned configuration=Burstable classes (includes t classes), Instance type=db.t3.medium", errors: [
-      { problem: "ไม่เห็น db.t3.medium ใน dropdown", cause: "ไม่ได้เลือก Burstable classes (includes t classes) — ถ้าเลือก Standard classes จะเห็นแต่ db.m5, db.r5", fix: "เปลี่ยน Type of provisioned configuration เป็น Burstable classes (includes t classes) แล้ว db.t3.medium จะปรากฏ" }
+      { problem: "ไม่เห็น db.t3.medium ใน dropdown", cause: "ไม่ได้เลือก Burstable classes (includes t classes) — ถ้าเลือก Standard classes จะเห็นแต่ db.m5, db.r5", fix: "เปลี่ยน Type of provisioned configuration เป็น Burstable classes (includes t classes) แล้ว db.t3.medium จะปรากฏ" },
+      { problem: "เลือก spec ผิดเป็น db.t3.small (ไม่ใช่ db.t3.medium)", cause: "t3.small กับ t3.medium อยู่ติดกันใน dropdown เลยกดผิด — lab กำหนด db.t3.medium และ spec นี้แก้ทีหลังไม่ได้", fix: "แก้ตอนนี้เลยก่อนกด Create database (ข้อ 16) — เปลี่ยน Instance type เป็น db.t3.medium\nถ้าสร้างไปแล้วด้วย spec ผิด จะไปเจอ error cluster ตอนทำ replica (ข้อ 55) และแก้ย้อนหลังไม่ได้ ต้อง End Lab แล้วเริ่มใหม่" },
+      { problem: "ไม่มี dropdown ให้เลือกในส่วน Cluster / dropdown ว่างเปล่า", cause: "เลือกประเภท database ผิดตั้งแต่ข้อ 6 — ถ้าไม่ใช่ Aurora (MySQL Compatible) ส่วน Cluster scalability type จะไม่มีตัวเลือกให้ หรือมีคนละชุด", fix: "ย้อนไปข้อ 6 เลือก Engine type=Aurora (MySQL Compatible) ก่อน แล้ว dropdown ในส่วน Cluster จะขึ้นครบ" }
     ]},
     { num: 9, task: "Task 1", desc: "ในส่วน Settings ตั้งค่า: DB cluster identifier=aurora, Master username=dbadmin, Credentials management=Self managed, Master password=LabPassword (ดูจากด้านซ้ายของหน้า lab)", errors: [
       { problem: "เจอ error 'Master password does not meet requirements'", cause: "ใส่ password ที่ไม่ตรงกับ LabPassword ที่ lab กำหนด หรือพิมพ์ผิด", fix: "ดูค่า LabPassword จากด้านซ้ายของหน้า lab instruction แล้ว copy มาวาง | Confirm password ต้องตรงกัน" },
@@ -41,13 +43,16 @@ const lab3Data = {
     { num: 16, task: "Task 1", desc: "Scroll ลงล่างสุดแล้วกด Create database", errors: [
       { problem: "เจอ error ตอนกด Create database", cause: "หลายสาเหตุ: Enhanced monitoring ยังติ๊กอยู่ / parameter group ผิด / SG ผิด / password ไม่ตรง", fix: "อ่าน error message ที่ขึ้น แล้วเช็ค:\n1. Enhanced monitoring เอาติ๊กออกแล้ว? (ข้อ 12)\n2. DB cluster parameter group ถูกต้อง? (ข้อ 14)\n3. Security group เป็น LabDBSecurityGroup? (ข้อ 11)\n4. Password ตรงกับ LabPassword? (ข้อ 9)" }
     ]},
-    { num: 17, task: "Task 1", desc: "ที่ Suggested add-ons for aurora pop-up กด Close", errors: [] },
+    { num: 17, task: "Task 1", desc: "ที่ Suggested add-ons for aurora pop-up กด Close", errors: [
+      { problem: "ผู้เรียนนั่งรอ database สร้างเสร็จ ไม่ทำอะไรต่อ", cause: "ไม่ใช่ error — Aurora cluster ใช้เวลาสร้างถึง 5 นาที แต่ lab ไม่ได้บังคับให้รอ | ผู้เรียนมักเข้าใจว่าต้องรอให้ Available ก่อนถึงทำข้อต่อไปได้", fix: "บอกให้ทำ Task 2 ต่อไปเลยระหว่างที่ database กำลังสร้าง (ข้อ 18) — ค่อยกลับมาเอา writer endpoint ตอน Task 3 (ข้อ 37) ซึ่งกว่าจะถึงตอนนั้น database ก็เสร็จแล้ว\nช่วยประหยัดเวลา lab ได้ 5 นาที ถ้ามีผู้เรียนหลายคนติดพร้อมกันให้ประกาศรวมได้เลย" }
+    ]},
     { num: 18, task: "Task 2.1", desc: "ค้นหา EC2 ใน search bar", errors: [] },
     { num: 19, task: "Task 2.1", desc: "ที่เมนูด้านซ้าย expand Load Balancing แล้วเลือก Target Groups", errors: [] },
     { num: 20, task: "Task 2.1", desc: "กด Create target group", errors: [] },
     { num: 21, task: "Task 2.1", desc: "ในส่วน Settings ตั้งค่า: Choose a target type=Instances, Target group name=ALBTargetGroup, VPC=LabVPC", errors: [
       { problem: "หา LabVPC ไม่เจอใน VPC dropdown", cause: "Region ผิด หรือ lab provisioning ยังไม่เสร็จ", fix: "เช็ค Region ที่มุมบนขวา ต้องตรงกับที่ lab กำหนด" },
-      { problem: "Target group name ไม่ถูกต้อง", cause: "ชื่อ target group มีข้อจำกัด เช่น ห้ามมี space หรืออักษรพิเศษ", fix: "ใส่ ALBTargetGroup (ไม่มี space, ไม่มีขีด)" }
+      { problem: "Target group name ไม่ถูกต้อง", cause: "ชื่อ target group มีข้อจำกัด เช่น ห้ามมี space หรืออักษรพิเศษ", fix: "ใส่ ALBTargetGroup (ไม่มี space, ไม่มีขีด)" },
+      { problem: "ตั้งค่าในหน้านี้ผิด (target type, ชื่อ, หรือ VPC) แล้วอยากแก้ทีหลัง", cause: "หัวข้อของส่วนนี้ในเอกสารคือ Settings - immutable ซึ่งหมายความว่าค่าพวกนี้แก้ย้อนหลังไม่ได้เลยหลังสร้าง target group แล้ว", fix: "ตรวจให้ครบก่อนกด Next: Choose a target type = Instances, Target group name = ALBTargetGroup, VPC = LabVPC\nถ้าสร้างไปแล้วผิด ต้อง delete target group แล้วสร้างใหม่ — และถ้า ALB ผูกกับ target group ตัวเก่าไว้แล้ว ต้องไปแก้ Listener ให้ชี้ target group ตัวใหม่ด้วย (ข้อ 32)\nที่แก้ได้ทีหลังคือรายการ target (register/deregister instance) ไม่ใช่ค่าพวกนี้" }
     ]},
     { num: 22, task: "Task 2.1", desc: "กด Next", errors: [] },
     { num: 23, task: "Task 2.1", desc: "ในส่วน Available instances เลือก (ติ๊ก) AppServer1 และ AppServer2 แล้วกด Include as pending below", errors: [
@@ -59,7 +64,9 @@ const lab3Data = {
     { num: 25, task: "Task 2.1", desc: "กด Create target group จะเห็น success message", errors: [] },
     { num: 26, task: "Task 2.2", desc: "ที่เมนูด้านซ้าย ในส่วน Load Balancing เลือก Load Balancers", errors: [] },
     { num: 27, task: "Task 2.2", desc: "กด Create load balancer", errors: [] },
-    { num: 28, task: "Task 2.2", desc: "ในส่วน Load balancer types ที่ Application Load Balancer กด Create", errors: [] },
+    { num: 28, task: "Task 2.2", desc: "ในส่วน Load balancer types ที่ Application Load Balancer กด Create", errors: [
+      { problem: "ตอนตั้ง Listener ไม่มี HTTP ให้เลือก (มีแต่ TCP / TLS / UDP)", cause: "เลือกชนิด Load Balancer ผิด — กด Create ที่ Network Load Balancer หรือ Gateway Load Balancer แทน Application Load Balancer | NLB ทำงานที่ Layer 4 จึงมีแต่ TCP/UDP ไม่มี HTTP ให้เลือก", fix: "ยกเลิกแล้วเริ่มใหม่ที่ข้อ 27 → ในหน้า Load balancer types ต้องกด Create ในกล่อง Application Load Balancer เท่านั้น → แล้ว Listener จะเป็น HTTP:80 ให้เลือก (ข้อ 32)" }
+    ]},
     { num: 29, task: "Task 2.2", desc: "ในส่วน Basic configuration ตั้ง Load balancer name=LabAppALB", errors: [] },
     { num: 30, task: "Task 2.2", desc: "ในส่วน Network mapping ตั้งค่า: VPC=LabVPC, เลือก AZ แรก=PublicSubnet1, เลือก AZ ที่สอง=PublicSubnet2", errors: [
       { problem: "ไม่เห็น PublicSubnet1 หรือ PublicSubnet2 ใน Subnet dropdown", cause: "ยังไม่ได้เลือก VPC=LabVPC ข้างบน หรือ ต้องติ๊ก checkbox ของ AZ ก่อนถึงจะเห็น subnet dropdown", fix: "เลือก VPC=LabVPC ก่อน → ติ๊ก checkbox ของ AZ ทั้ง 2 อัน → จะเห็น dropdown ให้เลือก subnet" },
@@ -85,14 +92,17 @@ const lab3Data = {
     ]},
     { num: 38, task: "Task 3", desc: "Copy Endpoint name ของ writer instance เก็บไว้ (จะใช้ตอน Task 4)", errors: [] },
     { num: 39, task: "Task 3", desc: "ดู tab Configuration สำหรับรายละเอียดการตั้งค่า", errors: [] },
-    { num: 40, task: "Task 3", desc: "ดู tab Monitoring สำหรับ metrics ต่างๆ", errors: [] },
+    { num: 40, task: "Task 3", desc: "ดู tab Monitoring สำหรับ metrics ต่างๆ", errors: [
+      { problem: "ข้ามไปทำ Task 4 ทันทีทั้งที่ database ยังไม่ Available", cause: "lab มี WARNING ตรงนี้ว่าต้องรอ Status ของ aurora DB instance เป็น Available ก่อนไปข้อถัดไป — ถ้าไม่รอ ตอนกด Save ที่หน้าเว็บ (ข้อ 49) จะต่อ database ไม่ได้ และผู้เรียนจะไล่หาสาเหตุผิดที่ว่าเป็นเรื่อง endpoint หรือ SG", fix: "เช็คก่อนไปต่อ: Aurora and RDS → Databases → ดู Status ของ aurora ต้องเป็น Available (ไม่ใช่ Creating / Modifying / Backing-up)\nถ้ายังไม่ Available ให้รอ กด refresh เป็นระยะ — ตอนสร้างใช้เวลาถึง 5 นาที (ข้อ 17)\nจุดต่างที่ต้องเข้าใจ: ระหว่าง Task 1 ไป Task 2 ไม่ต้องรอก็ได้ แต่ก่อนเข้า Task 4 ต้องรอให้ Available จริงๆ" }
+    ]},
     { num: 41, task: "Task 4", desc: "ค้นหา EC2 ใน search bar", errors: [] },
     { num: 42, task: "Task 4", desc: "ที่เมนูด้านซ้าย เลือก Target Groups", errors: [] },
     { num: 43, task: "Task 4", desc: "เลือก (ติ๊ก) ALBTargetGroup", errors: [] },
     { num: 44, task: "Task 4", desc: "ดู tab Targets รอจน instance status เป็น healthy", errors: [
       { problem: "Target status เป็น unhealthy", cause: "EC2 instances (AppServer1/AppServer2) ยังไม่ pass health check — web app อาจยังไม่พร้อม", fix: "รอ 2-3 นาทีให้ health check ผ่าน (ALB check ทุก 30 วินาที) | ถ้านานเกินไปเช็ค: instance running? Security Group ถูกต้อง? | ถ้า lab เพิ่ง start ใหม่ AppServer อาจยังไม่ boot เสร็จ ลองรอ 5 นาที" },
       { problem: "Target status เป็น unused หรือ draining", cause: "Instances ไม่ได้ถูก register ใน target group", fix: "ย้อนไปข้อ 23 ตรวจว่ากด Include as pending below แล้ว | หรือไปที่ Target Group → Register targets → เพิ่ม AppServer1 + AppServer2" },
-      { problem: "รอนานมากแล้วยัง unhealthy", cause: "AppServer ยังไม่ได้ start web application (lab provisioning ช้า)", fix: "ไปดู EC2 Instances ว่า AppServer1/AppServer2 มี Status check 2/2 passed | ถ้า passed แล้วยัง unhealthy → เช็คว่า Security Group ของ instance อนุญาต traffic จาก ALB security group เข้า port 80" }
+      { problem: "รอนานมากแล้วยัง unhealthy", cause: "AppServer ยังไม่ได้ start web application (lab provisioning ช้า)", fix: "ไปดู EC2 Instances ว่า AppServer1/AppServer2 มี Status check 2/2 passed | ถ้า passed แล้วยัง unhealthy → เช็คว่า Security Group ของ instance อนุญาต traffic จาก ALB security group เข้า port 80" },
+      { problem: "unhealthy ทั้ง 2 ตัวพร้อมกัน", cause: "ถ้าพังพร้อมกันทั้งคู่ มักไม่ใช่ปัญหาที่ตัว instance แต่เป็น config ที่ใช้ร่วมกัน — ส่วนใหญ่คือ Security Group เลือกผิด", fix: "จุดแรกที่ต้องดู: Security Group ของ AppServer ต้องเปิด inbound port 80 โดยระบุ Source เป็น ALB security group (LabALBSecurityGroup) ไม่ใช่ปล่อย default หรือใส่ SG อื่น\nถ้าแก้ SG แล้วยังไม่หาย ให้ดูที่ IAM role ของ AppServer แล้ว Stop & Start instance ให้ config ใหม่มีผล — แต่ถ้ากด Modify IAM role แล้วขึ้น AccessDenied คือ lab ปิด permission ไว้ กรณีนั้นแก้ที่ SG ทางเดียว\nถ้ายังไม่ขึ้นทั้งคู่หลังรอ 5 นาที ให้ End Lab แล้วเริ่มใหม่" }
     ]},
     { num: 45, task: "Task 4", desc: "ที่เมนูด้านซ้าย เลือก Load Balancers", errors: [] },
     { num: 46, task: "Task 4", desc: "กด link LabAppALB", errors: [] },
@@ -101,7 +111,8 @@ const lab3Data = {
       { problem: "เจอ 503 Service Unavailable", cause: "Target Group ยังไม่มี healthy targets", fix: "รอให้ targets เป็น healthy (ข้อ 44) — ถ้ารอนานแล้วยัง unhealthy ให้เช็คว่า instances running + port 80 เปิดอยู่" },
       { problem: "ERR_SSL_PROTOCOL_ERROR หรือ SSL error", cause: "ใช้ https:// แทน http://", fix: "เปลี่ยน URL เป็น http:// (ไม่มี s) เพราะ ALB listener เป็น HTTP:80 เท่านั้น" },
       { problem: "DNS name copy มาไม่ครบ หรือหน้าขึ้น 'site not found'", cause: "Copy DNS มาไม่ครบ (ตัดท้าย) หรือ copy มี space ติดหน้า", fix: "กลับไปที่ Load Balancers → กด copy icon ข้าง DNS name → paste ใหม่ | ตรวจว่าไม่มี space นำหน้า/ตามหลัง" },
-      { problem: "เห็น web page แต่แสดงผิดปกติ หรือ request ช้ามาก", cause: "ลืมลบ default Security Group ออกจาก ALB (ข้อ 31) ทำให้ ALB มี SG 2 ตัว ซึ่งอาจ conflict", fix: "ไปที่ Load Balancers → LabAppALB → Security → Edit → ลบ default SG ออก เหลือแค่ LabALBSecurityGroup" }
+      { problem: "เห็น web page แต่แสดงผิดปกติ หรือ request ช้ามาก", cause: "ลืมลบ default Security Group ออกจาก ALB (ข้อ 31) ทำให้ ALB มี SG 2 ตัว ซึ่งอาจ conflict", fix: "ไปที่ Load Balancers → LabAppALB → Security → Edit → ลบ default SG ออก เหลือแค่ LabALBSecurityGroup" },
+      { problem: "หน้าเว็บขึ้นแล้วแต่บอกให้ไป configure Settings เพื่อต่อ database — ผู้เรียนคิดว่ายังพลาดอะไรอยู่", cause: "ไม่ใช่ error — เป็นผลลัพธ์ที่ถูกต้องตามที่เอกสารแสดงไว้ | ตอนนี้ผ่าน ALB เข้าถึง web app ได้แล้ว แต่ยังไม่ได้บอก app ว่า database อยู่ที่ไหน จึงยังไม่มีข้อมูลมาแสดง", fix: "ถือว่าข้อนี้สำเร็จแล้ว ให้ไปต่อที่ tab Settings แล้วกรอกค่า 4 ช่อง (ข้อ 48): Endpoint = writer endpoint ที่ copy ไว้, Database = inventory, Username = dbadmin, Password = LabPassword จากแผงด้านซ้ายของ lab → กด Save\nจุดยืนยันว่ามาถูกทาง: ด้านล่างของหน้าจะบอก instance ID กับ Availability Zone ที่ตอบ request นั้น — ถ้าเห็นบรรทัดนี้แปลว่า ALB กับ target ทำงานปกติแล้ว\nถ้า refresh หลายครั้งแล้ว instance ID สลับไปมา แปลว่า target ทั้ง 2 ตัว healthy ดี" }
     ]},
     { num: 48, task: "Task 4", desc: "ที่ web page ที่เปิดขึ้น กดแท็บ Settings แล้วตั้งค่า: Endpoint=paste writer endpoint ที่ copy ไว้, Database=inventory, Username=dbadmin, Password=LabPassword แล้วกด Save", errors: [
       { problem: "กด Save แล้ว error 'Unable to connect to database'", cause: "Endpoint ผิด / Database name ผิด / Username หรือ Password ผิด / DB ยังไม่ Available", fix: "เช็คตามลำดับ:\n1. Endpoint เป็น writer endpoint ที่ copy มาจากข้อ 37-38? (ไม่ใช่ reader)\n2. Endpoint ไม่มี space ติดหน้า/หลัง? (ลอง delete แล้ว paste ใหม่)\n3. Database ใส่ inventory (ตัวเล็กทั้งหมด)?\n4. Username ใส่ dbadmin?\n5. Password ใส่ LabPassword ที่ดูจากด้านซ้ายของ lab?\n6. RDS status เป็น Available? (ข้อ 37)" },
@@ -110,7 +121,9 @@ const lab3Data = {
       { problem: "Paste endpoint แล้วยาวมาก มี port ต่อท้าย", cause: "Copy มาทั้ง endpoint + port (เช่น :3306) ซึ่งช่อง endpoint ไม่ต้องการ port", fix: "ใส่แค่ hostname เช่น aurora.cluster-xxxxx.us-west-2.rds.amazonaws.com โดยไม่ต้องใส่ :3306" },
       { problem: "กด Save แล้ว error 'Connection timed out' (ไม่ใช่ 'Unable to connect')", cause: "Security Group ของ RDS ไม่ได้เปิด port MySQL 3306 จาก App server — อาจเลือก SG ผิดตอนสร้าง DB (ข้อ 11)", fix: "ไปดู RDS → inventory-cluster → Connectivity & security → VPC security groups → ตรวจว่าเป็น LabDBSecurityGroup ที่มี inbound MySQL:3306 from Inventory-App SG" }
     ]},
-    { num: 49, task: "Task 4", desc: "กด Save — application จะเชื่อมต่อกับ database และแสดง inventory data", errors: [] },
+    { num: 49, task: "Task 4", desc: "กด Save — application จะเชื่อมต่อกับ database และแสดง inventory data", errors: [
+      { problem: "เข้า link ได้ หน้าเว็บขึ้น แต่ตาราง inventory ไม่ขึ้น", cause: "เว็บกับ ALB ปกติ (ไม่ใช่ปัญหา ALB แล้ว) แต่ App server คุยกับ database ไม่ได้ — ส่วนใหญ่คือ Security Group ของ Aurora ไม่ยอมรับ traffic จาก App server", fix: "ไปที่ Aurora and RDS → เลือก cluster aurora → Modify → ในส่วน Connectivity เปลี่ยน VPC security group เป็น LabDBSecurityGroup (ลบ default ออก) → Continue → Apply immediately → Modify cluster\nรอจน status กลับเป็น Available แล้วกด Save ที่หน้าเว็บใหม่ (ข้อ 48)\nแยกอาการให้ชัด: หน้าเว็บไม่ขึ้นเลย = ปัญหา ALB/target (ข้อ 47) | หน้าเว็บขึ้นแต่ตารางว่าง = ปัญหา DB/SG" }
+    ]},
     { num: 50, task: "Optional", desc: "กลับไปที่ tab AWS Management Console", errors: [] },
     { num: 51, task: "Optional", desc: "ค้นหา Aurora and RDS ใน search bar", errors: [] },
     { num: 52, task: "Optional", desc: "ที่เมนูด้านซ้าย เลือก Databases", errors: [] },
@@ -118,13 +131,18 @@ const lab3Data = {
     { num: 54, task: "Optional", desc: "กด Actions แล้วเลือก Create cross-Region read replica", errors: [
       { problem: "ไม่เห็นตัวเลือก Create cross-Region read replica ใน Actions menu", cause: "เลือก cluster แทน instance — ต้องเลือก DB instance (row ที่มี Role=Writer) ที่อยู่ใต้ cluster", fix: "กลับไปที่ Databases → ติ๊กที่ aurora instance (ไม่ใช่ row Regional cluster) แล้วกด Actions ใหม่" },
       { problem: "กด Create cross-Region read replica แล้วเจอ error หรือ option ไม่ให้เลือก", cause: "ข้อ 10 อาจเลือก 'Create an Aurora Replica' แทน 'Don't create' ทำให้ cluster มี replica อยู่แล้วและ config ไม่ตรงกับที่ lab ต้องการ", fix: "ถ้าเลือกข้อ 10 ผิดและ DB สร้างไปแล้ว → ต้อง delete cluster แล้วสร้างใหม่โดยเลือก Don't create an Aurora Replica | หรือถ้าเวลาไม่พอ ข้ามข้อ optional นี้ได้" },
-      { problem: "RDS status ยังไม่ Available", cause: "ต้องรอให้ DB instance เป็น Available ก่อนถึงจะทำ replica ได้", fix: "รอจน Status เปลี่ยนเป็น Available (อาจใช้เวลา 5+ นาที)" }
+      { problem: "RDS status ยังไม่ Available", cause: "ต้องรอให้ DB instance เป็น Available ก่อนถึงจะทำ replica ได้", fix: "รอจน Status เปลี่ยนเป็น Available (อาจใช้เวลา 5+ นาที)" },
+      { problem: "สร้าง replica ไม่ได้ (ข้อ Optional) — ขึ้น error เกี่ยวกับ parameter group", cause: "ตอนสร้าง database ปล่อย DB cluster parameter group เป็น default ไว้ (ข้อ 14) — ต้องเป็นค่า DBClusterParameterGroup ของ lab ที่ขึ้นต้นด้วย labstack- ไม่ใช่ default", fix: "ดูค่า DBClusterParameterGroup จากด้านซ้ายของหน้า lab แล้วเทียบกับที่ cluster ใช้อยู่: Aurora and RDS → cluster aurora → tab Configuration → ดู Parameter group\nถ้าเป็น default อยู่ แปลว่าตั้งผิดตั้งแต่ข้อ 14 และแก้ย้อนหลังไม่ได้ ต้อง End Lab แล้วทำใหม่ | ข้อ Optional นี้ข้ามได้ถ้าเวลาไม่พอ" }
     ]},
     { num: 55, task: "Optional", desc: "ในส่วน Connectivity ตั้งค่า: Destination Region=เลือก region ที่ตรงกับ RemoteRegion จากด้านซ้ายของ lab, Virtual private cloud (VPC)=LabVPC, Public access=No, Existing VPC security groups=ลบ default → เลือก LabDBSecurityGroup", errors: [
-      { problem: "หา LabVPC หรือ LabDBSecurityGroup ไม่เจอใน destination region", cause: "เลือก Destination Region ผิด — ต้องเลือกให้ตรงกับ RemoteRegion ที่ lab กำหนด", fix: "ดูค่า RemoteRegion จากด้านซ้ายของหน้า lab instruction แล้วเลือกให้ตรง" }
+      { problem: "หา LabVPC หรือ LabDBSecurityGroup ไม่เจอใน destination region", cause: "เลือก Destination Region ผิด — ต้องเลือกให้ตรงกับ RemoteRegion ที่ lab กำหนด", fix: "ดูค่า RemoteRegion จากด้านซ้ายของหน้า lab instruction แล้วเลือกให้ตรง" },
+      { problem: "สร้าง replica ไปแล้วแต่เลือก Region ผิด", cause: "replica ถูกสร้างใน region ที่ไม่ใช่ RemoteRegion — ย้าย region ทีหลังไม่ได้ และ lab ไม่ได้ให้ permission ไปลบ resource ใน region อื่น", fix: "End Lab แล้วเริ่ม lab ใหม่ — ข้อนี้เป็น Optional ถ้าเวลาไม่พอให้ข้ามไปเลย ไม่กระทบการผ่าน lab\nรอบหน้าให้ตรวจ Destination Region ให้ตรงกับ RemoteRegion ก่อนกด Create (ข้อ 57)" },
+      { problem: "เจอ error เกี่ยวกับ cluster ตอนสร้าง replica ที่ข้อนี้", cause: "spec ของ cluster ตอนสร้างไม่ตรงกับที่ lab กำหนด (มักเป็น instance type ผิด เช่นเลือก db.t3.small แทน db.t3.medium ที่ข้อ 8)", fix: "แก้ทีหลังไม่ได้ — จะเพิ่ม cluster ใหม่ หรือ edit database ย้อนหลังก็ไม่ได้เพราะ lab จำกัด permission ไว้ ต้อง End Lab แล้วทำใหม่\nรอบใหม่ให้ตั้ง Instance type=db.t3.medium ให้ถูกตั้งแต่ข้อ 8 | ถ้าเวลาไม่พอ ข้อ Optional นี้ข้ามได้" }
     ]},
-    { num: 56, task: "Optional", desc: "ในส่วน Settings ตั้ง DB instance identifier=LabDBReplica", errors: [] },
-    { num: 57, task: "Optional", desc: "กด Create จะเห็น success message 'Creating replica LabDBReplica'", errors: [
+    { num: 56, task: "Optional", desc: "ในส่วน Settings ตั้ง DB instance identifier=LabDBreplica", errors: [
+      { problem: "พิมพ์ชื่อ replica ผิดตัวพิมพ์เล็กใหญ่ (มักพิมพ์เป็น LabDBReplica)", cause: "ชื่อที่ lab กำหนดคือ LabDBreplica โดยที่ r ของคำว่า replica เป็นตัวเล็ก — คนส่วนใหญ่เห็น LabDB เป็นตัวใหญ่แล้วพิมพ์ R ตัวใหญ่ต่อโดยอัตโนมัติ", fix: "copy ชื่อจาก lab instruction มาวางเลย อย่าพิมพ์เอง — ต้องเป็น LabDBreplica\nข้อความยืนยันหลังกด Create จะขึ้นชื่อ replica ที่สร้าง ให้อ่านทานว่าตรงกับที่ lab กำหนด (ข้อ 57)\nชื่อ DB instance identifier แก้ทีหลังไม่ได้ ถ้าผิดต้องลบ replica แล้วสร้างใหม่ — แต่ข้อนี้เป็น Optional ถ้าเวลาไม่พอข้ามได้" }
+    ]},
+    { num: 57, task: "Optional", desc: "กด Create จะเห็น success message 'Creating replica LabDBreplica'", errors: [
       { problem: "เจอ error ตอนกด Create", cause: "Source DB ยัง not Available / Region ผิด / SG ผิด", fix: "เช็ค: Source aurora instance status=Available? | Destination Region ตรงกับ RemoteRegion? | Security group เป็น LabDBSecurityGroup?" }
     ]},
     { num: 58, task: "Optional", desc: "กด link 'Click here' เพื่อดู replica ใน destination region", errors: [] },
