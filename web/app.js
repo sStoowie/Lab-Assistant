@@ -46,12 +46,14 @@ function openLab(lab) {
   document.getElementById('labDesc').textContent = labs[lab].desc;
   document.getElementById('tab-spec').innerHTML = specsHTML[lab];
   renderSteps(labs[lab].data());
+  renderTroubleshoot(lab);
 
   // Reset to spec tab
   document.querySelectorAll('.spec-tab').forEach(t => t.classList.remove('active'));
   document.querySelector('[data-tab="spec"]').classList.add('active');
   document.getElementById('tab-spec').classList.remove('hidden');
   document.getElementById('tab-steps').classList.add('hidden');
+  document.getElementById('tab-troubleshoot').classList.add('hidden');
 
   window.scrollTo(0, 0);
 }
@@ -71,6 +73,7 @@ function setupTabs() {
       tab.classList.add('active');
       document.getElementById('tab-spec').classList.toggle('hidden', t !== 'spec');
       document.getElementById('tab-steps').classList.toggle('hidden', t !== 'steps');
+      document.getElementById('tab-troubleshoot').classList.toggle('hidden', t !== 'troubleshoot');
     });
   });
 }
@@ -144,3 +147,41 @@ document.addEventListener('mousemove', e => {
 });
 document.addEventListener('mousedown', () => cursor.classList.add('active'));
 document.addEventListener('mouseup', () => cursor.classList.remove('active'));
+
+
+// Render Troubleshoot tab
+function renderTroubleshoot(lab) {
+  const container = document.getElementById('tab-troubleshoot');
+  const data = troubleshootData[lab] || [];
+
+  if (data.length === 0) {
+    container.innerHTML = '<p style="color:#718096;padding:1rem">Lab นี้ยังไม่มี troubleshooting checklist</p>';
+    return;
+  }
+
+  let html = '';
+  data.forEach(issue => {
+    html += `<div class="ts-issue">
+      <div class="ts-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="ts-title">${issue.title}</span>
+        <span class="ts-arrow">▼</span>
+      </div>
+      <div class="ts-body">
+        <div class="ts-when">${issue.when}</div>
+        <div class="ts-checks">
+          ${issue.checks.map((c, i) => `<div class="ts-check">
+            <div class="ts-check-num">${i + 1}</div>
+            <div class="ts-check-content">
+              <div class="ts-where">${c.where}</div>
+              <div class="ts-what">เช็ค: <strong>${c.check}</strong></div>
+              <div class="ts-expect">✅ ต้องเป็น: ${c.expect}</div>
+              <div class="ts-ifnot">❌ ถ้าไม่ตรง: ${c.ifNot}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}

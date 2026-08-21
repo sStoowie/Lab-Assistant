@@ -255,7 +255,8 @@ const lab2Data = {
     { num: 145, task: "Optional 1", desc: "เลือก tab Session Manager", errors: [] },
     { num: 146, task: "Optional 1", desc: "กด Connect เพื่อเข้า Public Instance", errors: [] },
     { num: 147, task: "Optional 1", desc: "พิมพ์ curl แล้วตามด้วย Private IP ที่ copy มา (เช่น curl 10.0.2.131)", errors: [
-      { problem: "curl timeout หรือ Connection refused", cause: "Private Security Group ไม่มี inbound rule HTTP ที่ source เป็น Public SG หรือ httpd ไม่ได้ running บน Private Instance", fix: "ตรวจ Private SG ว่ามี inbound HTTP โดย source เป็น Public SG (ข้อ 103) | ถ้า httpd ไม่ running ให้ SSM เข้า Private Instance แล้ว run: sudo systemctl start httpd" }
+      { problem: "curl timeout หรือ Connection refused", cause: "Private Security Group ไม่มี inbound rule HTTP ที่ source เป็น Public SG หรือ httpd ไม่ได้ running บน Private Instance", fix: "ตรวจ Private SG ว่ามี inbound HTTP โดย source เป็น Public SG (ข้อ 103) | ถ้า httpd ไม่ running ให้ SSM เข้า Private Instance แล้ว run: sudo systemctl start httpd" },
+      { problem: "curl ค้าง ไม่มีอะไรเกิดขึ้นเลย (ไม่มี output ไม่มี error)", cause: "สาเหตุเดียวกับ timeout แต่ curl ยังรอ response อยู่ไม่ได้ตัดเอง — traffic ถูก block โดย Security Group หรือ Private IP ที่ใส่ผิด", fix: "กด Ctrl+C เพื่อตัด curl ก่อน → เช็ค:\n1. Private SG มี inbound HTTP from Public SG? (ข้อ 103)\n2. IP ที่ใส่เป็น Private IPv4 (10.0.2.x) ไม่ใช่ Public IP?\n3. httpd running บน Private Instance? (SSM เข้าไปเช็ค: sudo systemctl status httpd)" }
     ]},
     { num: 148, task: "Optional 1", desc: "ดูผลลัพธ์ของ curl command ต้องเห็น HTML ของ web page จาก Private Instance", errors: [] },
     { num: 149, task: "Optional 1", desc: "พิมพ์ ping แล้วตามด้วย Private IP (เช่น ping 10.0.2.131)", errors: [
