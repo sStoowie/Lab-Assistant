@@ -320,12 +320,16 @@ const debugChecklistData = {
     {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
-        { check: 'ตอน public test → Block Public Access', mustBe: '☐ เอาติ๊กออก + ☑ acknowledge' },
-        { check: 'Upload object permissions', mustBe: '☑ Grant public-read + acknowledge' },
-        { check: 'Origin access', mustBe: 'Origin access control settings (สร้าง OAC)' },
-        { check: 'หลังตั้ง OAC → Bucket policy', mustBe: 'Copy จาก banner เหลือง → paste ใน S3' },
-        { check: 'หลัง lock down → Block Public Access', mustBe: '☑ On กลับ' },
-        { check: 'URL path', mustBe: 'ตรงตัวพิมพ์ /CachedObjects/logo.png' }
+        { check: 'Bucket settings ตอนสร้าง', mustBe: 'ปล่อย Default ทั้งหมด' },
+        { check: 'ตอน public test → Block Public Access', mustBe: '☐ เอาติ๊กออก → พิมพ์ confirm' },
+        { check: 'Public-read policy Resource', mustBe: 'เติม /* ต่อท้าย ARN' },
+        { check: 'Folder ก่อน upload', mustBe: 'สร้าง CachedObjects แล้วค่อย upload' },
+        { check: 'Origin access', mustBe: 'Origin access control settings → Create OAC' },
+        { check: 'Origin path', mustBe: 'เว้นว่าง' },
+        { check: 'CloudFront bucket policy Resource', mustBe: 'เติม /* ต่อท้าย ARN' },
+        { check: 'AWS:SourceArn', mustBe: 'CloudFront distribution ARN (ไม่ใช่ domain)' },
+        { check: 'Behavior → Cache key', mustBe: 'Cache policy and origin request policy' },
+        { check: 'หลัง lock down → Block Public Access', mustBe: '☑ On กลับ → พิมพ์ confirm' }
       ]
     },
     {
