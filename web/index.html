@@ -46,14 +46,16 @@
             <p id="searchStatus" class="search-status hidden" role="status" aria-live="polite"></p>
 
             <div class="spec-section">
-                <div class="spec-tabs" role="tablist">
+                <div class="spec-tabs" role="tablist" aria-label="Lab tools">
                     <button class="spec-tab active" data-tab="spec" role="tab" aria-selected="true">Spec</button>
                     <button class="spec-tab" data-tab="steps" role="tab" aria-selected="false">Steps & Errors</button>
                     <button class="spec-tab" data-tab="troubleshoot" role="tab" aria-selected="false">Troubleshoot</button>
+                    <button class="spec-tab debug-tab" data-tab="debug" role="tab" aria-selected="false">DEBUG</button>
                 </div>
-                <div id="tab-spec" class="tab-content"></div>
-                <div id="tab-steps" class="tab-content hidden"></div>
-                <div id="tab-troubleshoot" class="tab-content hidden"></div>
+                <div id="tab-spec" class="tab-content" role="tabpanel"></div>
+                <div id="tab-steps" class="tab-content hidden" role="tabpanel"></div>
+                <div id="tab-troubleshoot" class="tab-content hidden" role="tabpanel"></div>
+                <div id="tab-debug" class="tab-content hidden" role="tabpanel"></div>
             </div>
         </div>
     </div>
@@ -67,6 +69,7 @@
     <script src="lab7-data.js"></script>
     <script src="specs.js"></script>
     <script src="troubleshoot.js"></script>
+    <script src="debug.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -120,6 +120,15 @@ function getTroubleshootData(key) {
   }
 }
 
+function getDebugData() {
+  try {
+    return Array.isArray(universalDebugData) ? universalDebugData : [];
+  } catch (err) {
+    logIssue('error', `debug.js โหลดไม่สำเร็จ — ${err.message}`);
+    return [];
+  }
+}
+
 /**
  * Structural check on one lab's steps. Surfaces the mistakes that are easy to
  * make when a TA appends a new error entry by hand: missing field, duplicate
@@ -323,6 +332,7 @@ function openLab(key) {
 
   renderSteps(data);
   renderTroubleshoot(key);
+  renderDebug(key);
 
   resetSearch();
   showTab('spec');
@@ -343,7 +353,7 @@ function goHome() {
    so two panels could render at once.
    ========================================================= */
 
-const TABS = ['spec', 'steps', 'troubleshoot'];
+const TABS = ['spec', 'steps', 'troubleshoot', 'debug'];
 
 function showTab(name) {
   if (!TABS.includes(name)) {
@@ -598,6 +608,74 @@ function renderTroubleshoot(key) {
       </div>
     </div>`;
   }).join('');
+}
+
+/* =========================================================
+   UNIVERSAL DEBUG
+   ========================================================= */
+
+function toggleChecklist(header) {
+  if (!header) return;
+  const issue = header.closest('.ts-issue');
+  if (!issue) return;
+  const isOpen = issue.classList.toggle('open');
+  header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+function renderDebug(key) {
+  const container = document.getElementById('tab-debug');
+  if (!container) {
+    logIssue('error', 'ไม่พบ #tab-debug ใน index.html');
+    return;
+  }
+
+  const data = getDebugData();
+  if (data.length === 0) {
+    container.innerHTML = '<p class="empty-note">โหลด universal DEBUG checklist ไม่สำเร็จ</p>';
+    return;
+  }
+
+  const phases = data.map((phase, index) => {
+    if (!phase || typeof phase !== 'object') {
+      logIssue('warn', `debug phase[${index}] ไม่ใช่ object`);
+      return '';
+    }
+    ['phase', 'icon', 'title', 'when', 'checks'].forEach(field => {
+      if (!phase[field]) logIssue('warn', `debug phase[${index}] ไม่มี "${field}"`);
+    });
+
+    const checks = Array.isArray(phase.checks) ? phase.checks.filter(Boolean) : [];
+    const phaseName = String(phase.phase || '').replace(/[^a-z0-9_-]/gi, '');
+    const isOpen = index === 0;
+
+    return `<div class="ts-issue debug-phase phase-${phaseName}${isOpen ? ' open' : ''}">
+      <button class="ts-header" type="button" onclick="toggleChecklist(this)"
+          aria-expanded="${isOpen ? 'true' : 'false'}">
+        <span class="ts-title" data-icon="${escapeHtml(phase.icon)}">${escapeHtml(phase.title)}</span>
+        <span class="ts-arrow">▼</span>
+      </button>
+      <div class="ts-body">
+        <div class="ts-when">${escapeHtml(phase.when)}</div>
+        <div class="ts-checks">
+          ${checks.map((check, checkIndex) => `<div class="ts-check">
+            <div class="ts-check-num">${checkIndex + 1}</div>
+            <div class="ts-check-content">
+              <div class="ts-where">${escapeHtml(check.where)}</div>
+              <div class="ts-what">เช็ค: <strong>${escapeHtml(check.check)}</strong></div>
+              <div class="ts-expect">✅ ต้องเป็น: ${escapeHtml(check.expect)}</div>
+              <div class="ts-ifnot">❌ ถ้าไม่ตรง: ${formatText(check.ifNot)}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `<div class="debug-intro">
+    <h3>DEBUG ครอบจักรวาล — ${escapeHtml(LAB_META[key].title)}</h3>
+    <p>ไล่จากด่าน 1 ไป 7 ตามลำดับและตอบจากหลักฐานจริง หากทำครบ อย่างน้อยจะรู้ว่า error อยู่ที่ layer ไหน แม้ยังไม่รู้วิธีแก้ทันที</p>
+    <span class="debug-rule">กติกา: เจอ ❌ ข้อแรก ให้หยุดและแก้ตรงนั้นก่อน</span>
+  </div>${phases}`;
 }
 
 /* =========================================================

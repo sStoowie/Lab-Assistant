@@ -19,7 +19,7 @@ const vm = require('vm');
 
 const WEB_DIR = path.join(__dirname, '..', 'web');
 const LAB_KEYS = ['lab1', 'lab2', 'lab3', 'lab4', 'lab5', 'lab6', 'lab7'];
-const DATA_FILES = LAB_KEYS.map(k => `${k}-data.js`).concat(['specs.js', 'troubleshoot.js']);
+const DATA_FILES = LAB_KEYS.map(k => `${k}-data.js`).concat(['specs.js', 'troubleshoot.js', 'debug.js']);
 
 const errors = [];
 const warnings = [];
@@ -64,9 +64,14 @@ if (fs.existsSync(indexPath)) {
       addError(`index.html: ไม่ได้ include <script src="${file}">`);
     }
   }
+  const debugScriptIndex = indexHtml.indexOf('src="debug.js"');
+  const appScriptIndex = indexHtml.indexOf('src="app.js"');
+  if (debugScriptIndex !== -1 && appScriptIndex !== -1 && debugScriptIndex > appScriptIndex) {
+    addError('index.html: ต้องโหลด debug.js ก่อน app.js');
+  }
   // Elements app.js looks up by id.
   for (const id of ['labGrid', 'labpage', 'homepage', 'labTitle', 'labDesc',
-                    'tab-spec', 'tab-steps', 'tab-troubleshoot',
+                    'tab-spec', 'tab-steps', 'tab-troubleshoot', 'tab-debug',
                     'searchInput', 'jumpInput', 'searchStatus', 'errorBanner']) {
     if (!indexHtml.includes(`id="${id}"`)) {
       addError(`index.html: ไม่มี element id="${id}" ที่ app.js เรียกใช้`);
@@ -91,9 +96,11 @@ function collectRefs(text) {
 
 const specsHTML = readGlobal('specsHTML');
 const troubleshootData = readGlobal('troubleshootData');
+const universalDebugData = readGlobal('universalDebugData');
 
 if (!specsHTML || typeof specsHTML !== 'object') addError('specs.js: ไม่มี specsHTML object');
 if (!troubleshootData || typeof troubleshootData !== 'object') addError('troubleshoot.js: ไม่มี troubleshootData object');
+if (!Array.isArray(universalDebugData)) addError('debug.js: ไม่มี universalDebugData array');
 
 let totalSteps = 0;
 let totalErrors = 0;
@@ -216,6 +223,36 @@ for (const [key, list] of Object.entries(troubleshootData || {})) {
       }
       for (const field of ['where', 'check', 'expect', 'ifNot']) {
         if (!c[field]) addError(`${label}.checks[${j}]: ไม่มี "${field}"`);
+      }
+    });
+  });
+}
+
+/* ---------- validate universal DEBUG checklist ---------- */
+
+if (Array.isArray(universalDebugData)) {
+  if (universalDebugData.length === 0) addError('universalDebugData: ต้องมีอย่างน้อย 1 phase');
+  universalDebugData.forEach((phase, i) => {
+    const label = `universalDebugData[${i}]`;
+    if (!phase || typeof phase !== 'object') {
+      addError(`${label}: ไม่ใช่ object`);
+      return;
+    }
+    for (const field of ['phase', 'icon', 'title', 'when']) {
+      if (!phase[field]) addError(`${label}: ไม่มี "${field}"`);
+    }
+    if (!Array.isArray(phase.checks)) {
+      addError(`${label}: checks ต้องเป็น array`);
+      return;
+    }
+    if (phase.checks.length === 0) addError(`${label}: checks ว่าง`);
+    phase.checks.forEach((check, j) => {
+      if (!check || typeof check !== 'object') {
+        addError(`${label}.checks[${j}]: ไม่ใช่ object`);
+        return;
+      }
+      for (const field of ['where', 'check', 'expect', 'ifNot']) {
+        if (!check[field]) addError(`${label}.checks[${j}]: ไม่มี "${field}"`);
       }
     });
   });

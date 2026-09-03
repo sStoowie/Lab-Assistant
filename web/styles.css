@@ -1131,3 +1131,95 @@ header h1 {
     outline: 2px solid #2b6cb0;
     outline-offset: 2px;
 }
+
+/* Universal DEBUG tab */
+.spec-tabs {
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.spec-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.debug-tab {
+    color: #805ad5;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+}
+
+.debug-tab.active {
+    color: #6b46c1;
+    border-bottom-color: #805ad5;
+}
+
+.debug-intro {
+    margin-bottom: 1rem;
+    padding: 1rem 1.2rem;
+    color: #44337a;
+    background: linear-gradient(135deg, #faf5ff, #ebf8ff);
+    border: 1px solid #d6bcfa;
+    border-left: 4px solid #805ad5;
+    border-radius: 10px;
+}
+
+.debug-intro h3 {
+    margin-bottom: 0.35rem;
+    color: #553c9a;
+    font-size: 1rem;
+}
+
+.debug-intro p {
+    font-size: 0.84rem;
+    line-height: 1.6;
+}
+
+.debug-rule {
+    display: inline-block;
+    margin-top: 0.65rem;
+    padding: 0.35rem 0.65rem;
+    color: #fff;
+    background: #6b46c1;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.ts-header {
+    width: 100%;
+    border: 0;
+    text-align: left;
+    font: inherit;
+}
+
+.debug-phase {
+    --phase-color: #805ad5;
+    border-left: 3px solid var(--phase-color);
+}
+
+.debug-phase .ts-title::before {
+    content: attr(data-icon);
+    font-size: 0.9rem;
+}
+
+.debug-phase .ts-check-num { background: var(--phase-color); }
+.debug-phase .ts-when { border-left-color: var(--phase-color); }
+.debug-phase .ts-header:hover,
+.debug-phase.open .ts-header { background: #faf5ff; }
+
+.phase-reproduce { --phase-color: #e53e3e; }
+.phase-context { --phase-color: #dd6b20; }
+.phase-ready { --phase-color: #d69e2e; }
+.phase-flow { --phase-color: #3182ce; }
+.phase-access { --phase-color: #805ad5; }
+.phase-runtime { --phase-color: #319795; }
+.phase-prove { --phase-color: #38a169; }
+
+@media (max-width: 768px) {
+    .spec-tab { padding: 0.6rem 0.85rem; }
+    .debug-intro { padding: 0.85rem; }
+    .ts-header { padding: 0.85rem; }
+    .ts-body { padding: 0.75rem; }
+    .ts-check { padding: 0.65rem; gap: 0.6rem; }
+}
