@@ -3,8 +3,10 @@ const debugChecklistData = {
     {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
+        { check: 'S3 Console → Region', mustBe: '{LabRegion} ก่อนกด Create bucket' },
         { check: 'S3 bucket settings', mustBe: 'ปล่อย Default ทั้งหมด' },
-        { check: 'CLI bucket name', mustBe: 'ต้องต่างจาก console bucket' }
+        { check: 'Console bucket name', mustBe: 'labbucket-{NUMBER} / ตัวเล็ก / unique' },
+        { check: 'CLI bucket name', mustBe: 'labclibucket-{NUMBER} / ห้ามใช้ชื่อ console bucket' }
       ]
     },
     {
@@ -40,12 +42,27 @@ const debugChecklistData = {
     {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
-        { check: 'Lab VPC → Edit VPC settings', mustBe: '☑ Enable DNS hostnames' },
-        { check: 'Public Subnet → Edit', mustBe: '☑ Enable auto-assign public IPv4' },
-        { check: 'NAT Gateway', mustBe: 'อยู่ใน Public Subnet + Allocate Elastic IP' },
-        { check: 'Public Instance → Auto-assign public IP', mustBe: '☑ Enable' },
-        { check: 'Private Instance → Auto-assign public IP', mustBe: '☐ Disable' },
-        { check: 'User data บรรทัดแรก', mustBe: '#!/bin/bash (ไม่มีบรรทัดว่างนำหน้า)' }
+        { check: 'Create VPC → Resources to create', mustBe: 'VPC only (ห้าม VPC and more)' },
+        { check: 'Lab VPC → Edit VPC settings', mustBe: '☑ Enable DNS hostnames → Save' },
+        { check: 'Subnets → VPC ID', mustBe: 'Lab VPC ทุกครั้ง (ห้าม default VPC)' },
+        { check: 'Subnets → Availability Zone', mustBe: 'AZ แรกตัวเดียวกันทั้งคู่ (ห้าม No Preference)' },
+        { check: 'Public Subnet → Edit subnet settings', mustBe: '☑ Enable auto-assign public IPv4 → Save' },
+        { check: 'Lab IGW → Attach to VPC', mustBe: 'Lab VPC → Attach internet gateway' },
+        { check: 'Route Tables → VPC', mustBe: 'Lab VPC ทุกครั้ง (ห้าม default VPC)' },
+        { check: 'Public Route Table → Add route', mustBe: '0.0.0.0/0 → Internet Gateway → Lab IGW' },
+        { check: 'Public RT → Subnet association', mustBe: '☑ Public Subnet เท่านั้น → Save associations' },
+        { check: 'Security Groups → VPC', mustBe: 'Lab VPC ทุกครั้ง (ห้าม default VPC)' },
+        { check: 'Private SG → Inbound Source', mustBe: 'Custom → Public SG (ห้าม Anywhere-IPv4)' },
+        { check: 'EC2 ทั้ง 2 → Key pair', mustBe: 'Proceed without a key pair' },
+        { check: 'Public EC2 → Network settings', mustBe: 'Edit → Lab VPC / Public Subnet / Public IP Enable' },
+        { check: 'Public EC2 → Firewall', mustBe: 'Select existing security group → Public SG' },
+        { check: 'EC2 ทั้ง 2 → Advanced details', mustBe: 'IAM instance profile = EC2InstProfile' },
+        { check: 'EC2 ทั้ง 2 → User data', mustBe: '#!/bin/bash เป็นบรรทัดแรก' },
+        { check: 'NAT Gateway', mustBe: 'Public Subnet → Allocate Elastic IP → Create' },
+        { check: 'Private Route Table → Add route', mustBe: '0.0.0.0/0 → NAT Gateway → Lab NGW' },
+        { check: 'Private RT → Subnet association', mustBe: '☑ Private Subnet เท่านั้น → Save associations' },
+        { check: 'Private EC2 → Network settings', mustBe: 'Edit → Lab VPC / Private Subnet / Public IP Disable' },
+        { check: 'Private EC2 → Firewall', mustBe: 'Select existing security group → Private SG' }
       ]
     },
     {
@@ -117,13 +134,27 @@ const debugChecklistData = {
     {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
+        { check: 'Create database', mustBe: 'Full configuration (ห้าม Easy create)' },
+        { check: 'Engine', mustBe: 'Aurora MySQL Compatible' },
+        { check: 'Template / Scalability', mustBe: 'Dev/Test / Provisioned' },
+        { check: 'Provisioned class', mustBe: 'Burstable → db.t3.medium' },
         { check: 'Credentials management', mustBe: 'Self managed' },
-        { check: 'Security group', mustBe: 'ลบ default ออก → เหลือ LabDBSecurityGroup' },
-        { check: 'Monitoring', mustBe: '☐ เอาติ๊ก Enhanced monitoring ออก' },
-        { check: 'Additional config → Initial database name', mustBe: 'inventory (ห้ามเว้นว่าง)' },
-        { check: 'Maintenance', mustBe: '☐ เอาติ๊ก Auto minor version upgrade ออก' },
-        { check: 'Register targets', mustBe: 'กด Include as pending below' },
-        { check: 'ALB SG', mustBe: 'ลบ default ออก → เหลือ LabALBSecurityGroup' }
+        { check: 'Multi-AZ deployment', mustBe: "Don't create an Aurora Replica" },
+        { check: 'Connectivity', mustBe: 'LabVPC / labdbsubnetgroup / Public access No' },
+        { check: 'VPC Security Group', mustBe: 'Choose existing → ลบ default → LabDBSecurityGroup' },
+        { check: 'Monitoring', mustBe: '☐ Enable Enhanced monitoring' },
+        { check: 'Additional configuration', mustBe: 'Expand' },
+        { check: 'Initial database name', mustBe: 'inventory (ห้ามเว้นว่าง)' },
+        { check: 'DB cluster parameter group', mustBe: '{DBClusterParameterGroup} (ห้าม default)' },
+        { check: 'Maintenance', mustBe: '☐ Enable auto minor version upgrade' },
+        { check: 'Target group', mustBe: 'Instances / ALBTargetGroup / LabVPC' },
+        { check: 'Register targets', mustBe: '☑ AppServer1 + AppServer2 → Include as pending below' },
+        { check: 'Load balancer type', mustBe: 'Application Load Balancer (ห้าม NLB)' },
+        { check: 'ALB Network mapping', mustBe: '☑ 2 AZ → PublicSubnet1 + PublicSubnet2' },
+        { check: 'ALB Security Group', mustBe: 'ลบ default → LabALBSecurityGroup' },
+        { check: 'ALB Default action', mustBe: 'HTTP:80 → ALBTargetGroup' },
+        { check: 'Optional replica source', mustBe: 'aurora Writer instance (ห้าม Regional cluster)' },
+        { check: 'Optional replica network', mustBe: '{RemoteRegion} / LabVPC / Public access No / LabDBSecurityGroup' }
       ]
     },
     {
@@ -181,12 +212,26 @@ const debugChecklistData = {
     {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
-        { check: 'User data บรรทัดแรก', mustBe: '#!/bin/bash (copy จาก AppServer)' },
-        { check: 'ASG subnets', mustBe: 'Private Subnet 1 + 2 (ไม่ใช่ Public)' },
-        { check: 'Health check grace period', mustBe: '300' },
-        { check: 'Second NAT subnet', mustBe: 'Public Subnet 2 (ไม่ใช่ Private / ไม่ใช่ Subnet 1)' },
-        { check: 'Aurora reader / Enhanced monitoring', mustBe: '☐ เอาติ๊กออก' },
-        { check: 'Failover ก่อนทำ', mustBe: 'inventory-replica ต้อง Available ก่อน' }
+        { check: 'Inventory settings page', mustBe: 'คงค่าที่ populate มาเป็น Default → Save' },
+        { check: 'Launch Template → Image', mustBe: 'Quick Start → Amazon Linux 2023' },
+        { check: 'Launch Template → Type', mustBe: 't3.micro' },
+        { check: 'Launch Template → SG', mustBe: 'Inventory-App เท่านั้น' },
+        { check: 'Launch Template → Advanced details', mustBe: 'IAM profile = Inventory-App-Role' },
+        { check: 'Launch Template → User data', mustBe: 'Copy จาก AppServer / #!/bin/bash บรรทัดแรก' },
+        { check: 'ASG → Launch template', mustBe: 'Lab-launch-template' },
+        { check: 'ASG → Network', mustBe: 'Lab VPC / Private Subnet 1 + 2' },
+        { check: 'ASG → Load balancer', mustBe: 'Attach existing → Target groups → Inventory-App | HTTP' },
+        { check: 'ASG → Grace period', mustBe: '300 seconds' },
+        { check: 'ASG → Group metrics', mustBe: '☑ Enable group metrics collection' },
+        { check: 'ASG → Tag', mustBe: 'Add tag → Name = Inventory-App' },
+        { check: 'Aurora reader → Resource', mustBe: 'inventory-cluster (ห้าม inventory-primary)' },
+        { check: 'Aurora reader → AZ', mustBe: 'ต่างจาก inventory-primary' },
+        { check: 'Aurora reader → Monitoring', mustBe: '☐ Enable Enhanced monitoring' },
+        { check: 'Second NAT → Mode / Subnet', mustBe: 'Zonal / Public Subnet 2' },
+        { check: 'Second NAT → Elastic IP', mustBe: 'Allocate Elastic IP → Create NAT gateway' },
+        { check: 'Private Route Table 2', mustBe: 'Lab VPC / 0.0.0.0/0 → my-nat-gateway' },
+        { check: 'Private RT 2 → Association', mustBe: '☑ Private Subnet 2 เท่านั้น' },
+        { check: 'Failover ก่อนกด', mustBe: 'inventory-replica = Available' }
       ]
     },
     {
@@ -248,13 +293,25 @@ const debugChecklistData = {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
         { check: 'SNS topic type', mustBe: 'Standard (ห้าม FIFO)' },
-        { check: 'SNS Access Policy', mustBe: 'แทน placeholder ให้ครบก่อนสร้าง S3 event' },
-        { check: 'S3 event Prefix', mustBe: 'ingest/ (มี slash)' },
-        { check: 'S3 event Suffix', mustBe: '.jpg (มีจุด ไม่ใช่ .jpeg)' },
-        { check: 'CreateThumbnail trigger', mustBe: 'thumbnail-queue (ไม่สลับ)' },
-        { check: 'CreateMobileImage trigger', mustBe: 'mobile-queue (ไม่สลับ)' },
-        { check: 'Handler', mustBe: 'ตรงตัวพิมพ์ เช่น CreateThumbnail.handler' },
-        { check: 'Trigger Batch size', mustBe: '1' }
+        { check: 'SQS ทั้ง 2 → Type', mustBe: 'Standard (ห้าม FIFO)' },
+        { check: 'SQS → Configuration parameters', mustBe: 'คง Default ทั้งหมด' },
+        { check: 'thumbnail-queue → SNS', mustBe: 'Subscribe → resize-image-topic → Save' },
+        { check: 'mobile-queue → SNS', mustBe: 'Subscribe → resize-image-topic เดียวกัน → Save' },
+        { check: 'SNS Access Policy editor', mustBe: 'ลบ policy เดิมทั้งหมด → paste policy ใหม่' },
+        { check: 'SNS Policy placeholders', mustBe: 'OWNER + ARN แทนครบทุกจุด / คง double quotes' },
+        { check: 'S3 Event types', mustBe: '☑ All object create events' },
+        { check: 'S3 Event filter', mustBe: 'Prefix ingest/ / Suffix .jpg' },
+        { check: 'S3 Event destination', mustBe: 'SNS topic → resize-image-topic' },
+        { check: 'Lambda Creation method', mustBe: 'Author from scratch' },
+        { check: 'Lambda Runtime', mustBe: 'Python 3.12' },
+        { check: 'Lambda Additional settings', mustBe: 'Custom execution role On → {LabExecutionRole}' },
+        { check: 'CreateThumbnail Trigger', mustBe: 'SQS → thumbnail-queue / Batch 1' },
+        { check: 'CreateThumbnail Code / Handler', mustBe: '{CreateThumbnailZIPLocation} / CreateThumbnail.handler' },
+        { check: 'CreateMobileImage Trigger', mustBe: 'SQS → mobile-queue / Batch 1' },
+        { check: 'CreateMobileImage Code / Handler', mustBe: '{CreateMobileImageZIPLocation} / CreateMobileImage.handler' },
+        { check: 'Lambda ทั้ง 2 → General config', mustBe: 'Timeout 60 sec / Memory 256 MB' },
+        { check: 'Lambda ทั้ง 2 → Environment', mustBe: 'bucket_name = {LabBucketName}' },
+        { check: 'Test object', mustBe: 'Upload ใน ingest/ / นามสกุล .jpg ตัวเล็ก' }
       ]
     },
     {
@@ -320,16 +377,25 @@ const debugChecklistData = {
     {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
-        { check: 'Bucket settings ตอนสร้าง', mustBe: 'ปล่อย Default ทั้งหมด' },
-        { check: 'ตอน public test → Block Public Access', mustBe: '☐ เอาติ๊กออก → พิมพ์ confirm' },
-        { check: 'Public-read policy Resource', mustBe: 'เติม /* ต่อท้าย ARN' },
-        { check: 'Folder ก่อน upload', mustBe: 'สร้าง CachedObjects แล้วค่อย upload' },
-        { check: 'Origin access', mustBe: 'Origin access control settings → Create OAC' },
-        { check: 'Origin path', mustBe: 'เว้นว่าง' },
-        { check: 'CloudFront bucket policy Resource', mustBe: 'เติม /* ต่อท้าย ARN' },
-        { check: 'AWS:SourceArn', mustBe: 'CloudFront distribution ARN (ไม่ใช่ domain)' },
+        { check: 'CloudFront', mustBe: 'ใช้ Distribution เดิม (ห้ามสร้างใหม่)' },
+        { check: 'S3 Bucket → Creation settings', mustBe: 'คง Default ทั้งหมด' },
+        { check: 'Public test → Block Public Access', mustBe: '☐ Block all → Save → พิมพ์ confirm' },
+        { check: 'Public-read policy Resource', mustBe: '{LabBucketArn}/*' },
+        { check: 'CachedObjects folder', mustBe: 'คง encryption Default → Create folder' },
+        { check: 'CloudFront-only policy Resource', mustBe: '{LabBucketArn}/*' },
+        { check: 'CloudFront-only AWS:SourceArn', mustBe: '{CloudFrontDistributionArn} (ห้าม domain)' },
+        { check: 'Lock down bucket', mustBe: '☑ Block all public access → Save → confirm' },
+        { check: 'Create Origin → Origin domain', mustBe: '{LabBucketName} จากส่วน Amazon S3' },
+        { check: 'Create Origin → Origin path', mustBe: 'เว้นว่าง' },
+        { check: 'Create Origin → Name', mustBe: 'My Amazon S3 Origin' },
+        { check: 'Create Origin → Origin access', mustBe: 'Origin access control settings → Create new OAC' },
+        { check: 'OAC modal', mustBe: 'คง Default ทั้งหมด → Create' },
+        { check: 'Origin settings อื่น', mustBe: 'คง Default → Create origin' },
+        { check: 'Create Behavior → Path', mustBe: 'CachedObjects/*.png' },
+        { check: 'Create Behavior → Origin', mustBe: 'My Amazon S3 Origin (ห้าม Load Balancer)' },
         { check: 'Behavior → Cache key', mustBe: 'Cache policy and origin request policy' },
-        { check: 'หลัง lock down → Block Public Access', mustBe: '☑ On กลับ → พิมพ์ confirm' }
+        { check: 'Behavior → Cache policy', mustBe: 'CachingOptimized' },
+        { check: 'Behavior settings อื่น', mustBe: 'คง Default → Create behavior' }
       ]
     },
     {
@@ -379,14 +445,48 @@ const debugChecklistData = {
     {
       title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
       items: [
-        { check: 'Aurora SG', mustBe: 'ลบ default ออก → เหลือ RDSSecurityGroup' },
-        { check: 'Aurora / Enhanced monitoring', mustBe: '☐ เอาติ๊กออก' },
-        { check: 'Aurora / Deletion protection', mustBe: '☐ เอาติ๊กออก' },
-        { check: 'Aurora Initial DB name', mustBe: 'WPDatabase (ไม่ใช่ MyDBCluster)' },
-        { check: 'EFS backups / encryption', mustBe: '☐ เอาติ๊กออกทั้งคู่' },
-        { check: 'EFS mount target SG', mustBe: 'ลบ default → EFSMountTargetSecurityGroup' },
-        { check: 'ALB SG', mustBe: 'ลบ default → AppInstanceSecurityGroup' },
-        { check: 'Stack param ALBDnsName', mustBe: 'ไม่มี http:// และไม่มี / ท้าย' }
+        { check: 'VPC Stack → Create mode', mustBe: 'With new resources (standard)' },
+        { check: 'VPC Stack → Template source', mustBe: 'Existing template → S3 URL → {Task1TemplateUrl}' },
+        { check: 'VPC Stack → Parameters / Options', mustBe: 'คง Default → Next → Next → Submit' },
+        { check: 'DB Subnet Group → VPC', mustBe: 'LabVPC' },
+        { check: 'DB Subnet Group → Subnets', mustBe: '10.0.4.0/24 + 10.0.5.0/24' },
+        { check: 'Aurora → Creation method', mustBe: 'Full configuration' },
+        { check: 'Aurora → Engine / Template', mustBe: 'Aurora MySQL / Production' },
+        { check: 'Aurora → Credentials', mustBe: 'Self managed' },
+        { check: 'Aurora → Instance', mustBe: 'Burstable → db.t3.medium' },
+        { check: 'Aurora → Multi-AZ', mustBe: 'Create Aurora Replica in different AZ' },
+        { check: 'Aurora → Network', mustBe: 'LabVPC / aurorasubnetgroup / Public access No' },
+        { check: 'Aurora → Security Group', mustBe: 'RDSSecurityGroup เท่านั้น → ลบ default' },
+        { check: 'Aurora → Port', mustBe: 'คง Default 3306' },
+        { check: 'Aurora → Monitoring', mustBe: '☐ Enable Enhanced monitoring' },
+        { check: 'Aurora → Initial DB', mustBe: 'WPDatabase (ห้าม MyDBCluster)' },
+        { check: 'Aurora → Encryption', mustBe: 'AWS owned KMS key (SSE-RDS)' },
+        { check: 'Aurora → Maintenance', mustBe: '☐ Enable auto minor version upgrade' },
+        { check: 'Aurora → Deletion protection', mustBe: '☐ Enable deletion protection' },
+        { check: 'EFS → Creation path', mustBe: 'Create file system → Customize' },
+        { check: 'EFS → Backups / Encryption', mustBe: '☐ Automatic backups / ☐ Encryption at rest' },
+        { check: 'EFS → Lifecycle', mustBe: 'IA None / Archive None' },
+        { check: 'EFS → Performance', mustBe: 'Bursting / General Purpose' },
+        { check: 'EFS → Mount targets', mustBe: 'AppSubnet1 + AppSubnet2' },
+        { check: 'EFS → Mount target SG', mustBe: 'EFSMountTargetSecurityGroup เท่านั้น → ลบ default ทั้งคู่' },
+        { check: 'EFS → File system policy', mustBe: 'ไม่ตั้งค่า → Next → Create' },
+        { check: 'Target Group → Type / VPC', mustBe: 'Instances / LabVPC' },
+        { check: 'Target Group → Register targets', mustBe: 'ไม่ register → Next → Create' },
+        { check: 'ALB → Type', mustBe: 'Application Load Balancer' },
+        { check: 'ALB → Subnets', mustBe: 'PublicSubnet1 + PublicSubnet2' },
+        { check: 'ALB → Security Group', mustBe: 'AppInstanceSecurityGroup เท่านั้น → ลบ default' },
+        { check: 'ALB → Default action', mustBe: 'HTTP:80 → myWPTargetGroup' },
+        { check: 'WP Stack → Create mode / Template', mustBe: 'With new resources → {Task5TemplateUrl}' },
+        { check: 'WP Stack → DB Name', mustBe: 'WPDatabase (ห้าม cluster name)' },
+        { check: 'WP Stack → ALBDnsName', mustBe: 'ไม่มี http:// / ไม่มี slash ท้าย / ไม่มี space' },
+        { check: 'WP Stack → Defaults', mustBe: 'wpadmin / t3.medium / LatestAL2023AmiId Default' },
+        { check: 'WP Stack → Options', mustBe: 'คง Default → Next → Submit' },
+        { check: 'ASG → Network', mustBe: 'LabVPC / AppSubnet1 + AppSubnet2' },
+        { check: 'ASG → Load balancer', mustBe: 'Attach existing → myWPTargetGroup | HTTP' },
+        { check: 'ASG → Health checks', mustBe: '☑ ELB health checks / Grace period 300+' },
+        { check: 'ASG → Scaling', mustBe: 'Desired 2 / Min 2 / Max 4 / Target tracking' },
+        { check: 'ASG → Group metrics', mustBe: '☑ Enable group metrics collection' },
+        { check: 'ASG → Tag', mustBe: 'Add tag → Name = WP-App' }
       ]
     },
     {
