@@ -1209,14 +1209,14 @@ header h1 {
 
 .debug-row {
     display: grid;
-    grid-template-columns: minmax(190px, 0.85fr) minmax(280px, 1.35fr);
-    gap: 1.6rem;
-    align-items: start;
-    padding: 0.82rem 1.05rem;
-    border-bottom: 1px solid #edf2f7;
+    grid-template-columns: minmax(210px, 0.85fr) minmax(300px, 1.35fr);
+    gap: 1.4rem;
+    align-items: center;
+    padding: 0.92rem 1.05rem;
+    border-bottom: 1px solid #e8edf4;
 }
 
-.debug-row:nth-child(even):not(.debug-table-head) { background: #fafcff; }
+.debug-row:nth-child(even):not(.debug-table-head) { background: #fbfcfe; }
 .debug-row:last-child { border-bottom: 0; }
 
 .debug-table-head {
@@ -1228,6 +1228,8 @@ header h1 {
     text-transform: uppercase;
 }
 
+.debug-table-head span:last-child { color: var(--debug-accent); }
+
 .debug-check,
 .debug-must {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Thai', sans-serif;
@@ -1235,16 +1237,23 @@ header h1 {
 }
 
 .debug-check {
-    color: #334155;
-    font-size: 0.88rem;
-    font-weight: 550;
+    padding-left: 0.75rem;
+    color: #1e293b;
+    border-left: 3px solid var(--debug-accent);
+    font-size: 0.9rem;
+    font-weight: 650;
 }
 
 .debug-must {
-    color: #166534;
-    font-size: 0.87rem;
-    font-weight: 650;
-    letter-spacing: 0.005em;
+    display: block;
+    padding: 0.58rem 0.72rem;
+    color: #1e293b;
+    background: var(--debug-tint);
+    border-left: 3px solid var(--debug-accent);
+    border-radius: 7px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.002em;
     overflow-wrap: anywhere;
 }
 
@@ -1254,7 +1263,31 @@ header h1 {
     .debug-group { margin-bottom: 1.15rem; }
     .debug-group-title { padding: 0.8rem 0.9rem; font-size: 0.9rem; }
     .debug-table-head { display: none; }
-    .debug-row { grid-template-columns: 1fr; gap: 0.4rem; padding: 0.8rem 0.9rem; }
-    .debug-check { color: #475569; font-size: 0.8rem; }
-    .debug-must { font-size: 0.86rem; }
+    .debug-row {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+        padding: 0.9rem;
+    }
+    .debug-check {
+        padding-left: 0;
+        border-left: 0;
+        color: #1e293b;
+        font-size: 0.86rem;
+    }
+    .debug-check::before,
+    .debug-must::before {
+        display: block;
+        margin-bottom: 0.18rem;
+        color: var(--debug-accent);
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+    .debug-check::before { content: 'จุดที่เช็ค'; }
+    .debug-must::before { content: 'ต้องเป็น'; }
+    .debug-must {
+        padding: 0.65rem 0.72rem;
+        font-size: 0.87rem;
+    }
 }
