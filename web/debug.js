@@ -1,6 +1,13 @@
 const debugChecklistData = {
   lab1: [
     {
+      title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
+      items: [
+        { check: 'S3 bucket settings', mustBe: 'ปล่อย Default ทั้งหมด' },
+        { check: 'CLI bucket name', mustBe: 'ต้องต่างจาก console bucket' }
+      ]
+    },
+    {
       title: 'Console / Command Host',
       items: [
         { check: 'Region', mustBe: '{LabRegion}' },
@@ -30,6 +37,17 @@ const debugChecklistData = {
   ],
 
   lab2: [
+    {
+      title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
+      items: [
+        { check: 'Lab VPC → Edit VPC settings', mustBe: '☑ Enable DNS hostnames' },
+        { check: 'Public Subnet → Edit', mustBe: '☑ Enable auto-assign public IPv4' },
+        { check: 'NAT Gateway', mustBe: 'อยู่ใน Public Subnet + Allocate Elastic IP' },
+        { check: 'Public Instance → Auto-assign public IP', mustBe: '☑ Enable' },
+        { check: 'Private Instance → Auto-assign public IP', mustBe: '☐ Disable' },
+        { check: 'User data บรรทัดแรก', mustBe: '#!/bin/bash (ไม่มีบรรทัดว่างนำหน้า)' }
+      ]
+    },
     {
       title: 'VPC / Subnets',
       items: [
@@ -97,6 +115,18 @@ const debugChecklistData = {
 
   lab3: [
     {
+      title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
+      items: [
+        { check: 'Credentials management', mustBe: 'Self managed' },
+        { check: 'Security group', mustBe: 'ลบ default ออก → เหลือ LabDBSecurityGroup' },
+        { check: 'Monitoring', mustBe: '☐ เอาติ๊ก Enhanced monitoring ออก' },
+        { check: 'Additional config → Initial database name', mustBe: 'inventory (ห้ามเว้นว่าง)' },
+        { check: 'Maintenance', mustBe: '☐ เอาติ๊ก Auto minor version upgrade ออก' },
+        { check: 'Register targets', mustBe: 'กด Include as pending below' },
+        { check: 'ALB SG', mustBe: 'ลบ default ออก → เหลือ LabALBSecurityGroup' }
+      ]
+    },
+    {
       title: 'Aurora',
       items: [
         { check: 'Region', mustBe: 'us-west-2' },
@@ -148,6 +178,17 @@ const debugChecklistData = {
   ],
 
   lab4: [
+    {
+      title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
+      items: [
+        { check: 'User data บรรทัดแรก', mustBe: '#!/bin/bash (copy จาก AppServer)' },
+        { check: 'ASG subnets', mustBe: 'Private Subnet 1 + 2 (ไม่ใช่ Public)' },
+        { check: 'Health check grace period', mustBe: '300' },
+        { check: 'Second NAT subnet', mustBe: 'Public Subnet 2 (ไม่ใช่ Private / ไม่ใช่ Subnet 1)' },
+        { check: 'Aurora reader / Enhanced monitoring', mustBe: '☐ เอาติ๊กออก' },
+        { check: 'Failover ก่อนทำ', mustBe: 'inventory-replica ต้อง Available ก่อน' }
+      ]
+    },
     {
       title: 'Security Chain',
       items: [
@@ -203,6 +244,19 @@ const debugChecklistData = {
   ],
 
   lab5: [
+    {
+      title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
+      items: [
+        { check: 'SNS topic type', mustBe: 'Standard (ห้าม FIFO)' },
+        { check: 'SNS Access Policy', mustBe: 'แทน placeholder ให้ครบก่อนสร้าง S3 event' },
+        { check: 'S3 event Prefix', mustBe: 'ingest/ (มี slash)' },
+        { check: 'S3 event Suffix', mustBe: '.jpg (มีจุด ไม่ใช่ .jpeg)' },
+        { check: 'CreateThumbnail trigger', mustBe: 'thumbnail-queue (ไม่สลับ)' },
+        { check: 'CreateMobileImage trigger', mustBe: 'mobile-queue (ไม่สลับ)' },
+        { check: 'Handler', mustBe: 'ตรงตัวพิมพ์ เช่น CreateThumbnail.handler' },
+        { check: 'Trigger Batch size', mustBe: '1' }
+      ]
+    },
     {
       title: 'SNS / SQS',
       items: [
@@ -264,6 +318,17 @@ const debugChecklistData = {
 
   lab6: [
     {
+      title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
+      items: [
+        { check: 'ตอน public test → Block Public Access', mustBe: '☐ เอาติ๊กออก + ☑ acknowledge' },
+        { check: 'Upload object permissions', mustBe: '☑ Grant public-read + acknowledge' },
+        { check: 'Origin access', mustBe: 'Origin access control settings (สร้าง OAC)' },
+        { check: 'หลังตั้ง OAC → Bucket policy', mustBe: 'Copy จาก banner เหลือง → paste ใน S3' },
+        { check: 'หลัง lock down → Block Public Access', mustBe: '☑ On กลับ' },
+        { check: 'URL path', mustBe: 'ตรงตัวพิมพ์ /CachedObjects/logo.png' }
+      ]
+    },
+    {
       title: 'CloudFront เดิม',
       items: [
         { check: 'Region', mustBe: 'us-west-2' },
@@ -307,6 +372,19 @@ const debugChecklistData = {
   ],
 
   lab7: [
+    {
+      title: '⚠️ ตอนสร้าง (ห้ามพลาด)',
+      items: [
+        { check: 'Aurora SG', mustBe: 'ลบ default ออก → เหลือ RDSSecurityGroup' },
+        { check: 'Aurora / Enhanced monitoring', mustBe: '☐ เอาติ๊กออก' },
+        { check: 'Aurora / Deletion protection', mustBe: '☐ เอาติ๊กออก' },
+        { check: 'Aurora Initial DB name', mustBe: 'WPDatabase (ไม่ใช่ MyDBCluster)' },
+        { check: 'EFS backups / encryption', mustBe: '☐ เอาติ๊กออกทั้งคู่' },
+        { check: 'EFS mount target SG', mustBe: 'ลบ default → EFSMountTargetSecurityGroup' },
+        { check: 'ALB SG', mustBe: 'ลบ default → AppInstanceSecurityGroup' },
+        { check: 'Stack param ALBDnsName', mustBe: 'ไม่มี http:// และไม่มี / ท้าย' }
+      ]
+    },
     {
       title: 'VPC Stack / Aurora',
       items: [
