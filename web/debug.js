@@ -1,86 +1,387 @@
-const universalDebugData = [
-  {
-    phase: 'reproduce',
-    icon: '🎯',
-    title: 'ด่าน 1 — ล็อกอาการให้ชัด (REPRODUCE)',
-    when: 'เริ่มตรงนี้ทุกครั้ง ห้ามแก้อะไรก่อนทำให้อาการเกิดซ้ำได้และเก็บข้อความ error ไว้',
-    checks: [
-      { where: 'จุดที่ผู้ใช้ทดสอบจริง', check: 'ทำ action เดิมซ้ำด้วย URL / command / file / input เดิม', expect: 'อาการเดิมเกิดซ้ำได้ และรู้แน่ชัดว่ากดหรือรันอะไร', ifNot: 'ถ้าเกิดบ้างไม่เกิดบ้าง ให้จดเวลาและเงื่อนไขที่ต่างกันก่อน เพราะอาจเป็น timing / propagation / cache' },
-      { where: 'Lab instruction → ผลลัพธ์ที่โจทย์ต้องการ', check: 'เขียน Expected กับ Actual อย่างละ 1 ประโยค', expect: 'ตอบได้ว่า “ควรเห็นอะไร” แต่ “ตอนนี้เห็นอะไร” โดยไม่ใช้แค่คำว่าใช้ไม่ได้', ifNot: 'กลับไปอ่าน Spec หรือ Steps เพื่อยืนยันผลที่ถูกต้องก่อน debug' },
-      { where: 'Browser / AWS Console / Terminal', check: 'เก็บ error แบบคำต่อคำ พร้อม status code และ timestamp', expect: 'มีข้อความจริง เช่น timeout, AccessDenied, 403, 503, unhealthy หรือ trigger ไม่ทำงาน', ifNot: 'เปิดรายละเอียด error / Status reason / Activity / Logs แล้วทดสอบอีกครั้ง ห้ามเดาจากอาการอย่างเดียว' },
-      { where: 'อาการที่เก็บได้', check: 'จัดประเภทความเสียหายเบื้องต้น', expect: 'เลือกได้หนึ่งกลุ่ม: หา resource ไม่เจอ / ยังไม่ ready / ต่อไม่ถึง / ถูกปฏิเสธ / runtime พัง / event ไม่ถูกเรียก', ifNot: 'ยังไม่ต้องแก้ ให้ทำสามข้อด้านบนจนจัดกลุ่มได้' }
-    ]
-  },
-  {
-    phase: 'context',
-    icon: '🧭',
-    title: 'ด่าน 2 — เช็คโลกที่กำลังอยู่ (CONTEXT)',
-    when: 'ตัดปัญหา “ทำถูกแต่ทำผิดที่” ซึ่งเป็นสาเหตุที่เสียเวลามากที่สุด',
-    checks: [
-      { where: 'AWS Console แถบขวาบน / Lab panel', check: 'Account, Role และ Region', expect: 'อยู่ account ของ lab, ใช้ role ที่กำหนด และ region ตรงกับโจทย์ทุกหน้า', ifNot: 'เจอจุดผิดแล้ว → สลับ account / role / region ให้ถูกก่อนตรวจอย่างอื่น' },
-      { where: 'หน้ารายละเอียด Resource', check: 'ชื่อ, ID, ARN, Tag และ VPC ของ resource ที่กำลังดู', expect: 'เป็น resource ของ lab นี้จริง ไม่ใช่ default, ของรอบเก่า หรือชื่อคล้ายกัน', ifNot: 'เจอจุดผิดแล้ว → กลับไปเลือก resource จาก ID/ARN ที่ถูกต้อง ไม่อ้างด้วยชื่ออย่างเดียว' },
-      { where: 'Steps & Errors', check: 'Prerequisite และลำดับข้อก่อนหน้าทำครบ', expect: 'ทุก resource ต้นทางที่ขั้นนี้พึ่งพามีอยู่จริง และไม่มีข้อก่อนหน้าถูกข้าม', ifNot: 'หยุดตรงนี้ → ทำข้อแรกที่ขาดให้สำเร็จก่อน แล้วค่อยทดสอบอาการเดิม' },
-      { where: 'ค่าที่ copy/paste หรือ Parameters', check: 'ไม่มี placeholder, ช่องว่าง, quote แปลก และตัวพิมพ์ผิด', expect: 'ค่าจริงครบถ้วน เช่น ID/ARN/endpoint/path และตัวพิมพ์ใหญ่เล็กตรงต้นฉบับ', ifNot: 'เจอจุดผิดแล้ว → copy ใหม่จาก source of truth แล้วบันทึก/รอ deploy ก่อนทดสอบ' }
-    ]
-  },
-  {
-    phase: 'ready',
-    icon: '⚡',
-    title: 'ด่าน 3 — ทุกชิ้นพร้อมทำงานหรือยัง (READY)',
-    when: 'resource ที่ยังสร้างไม่เสร็จหรือ health check ไม่ผ่าน จะทำให้ปลายทางพังแม้ config ถูก',
-    checks: [
-      { where: 'หน้ารายละเอียด Resource ทุกตัวใน flow', check: 'State / Status', expect: 'Running, Available, Active, Enabled หรือ CREATE_COMPLETE ตามชนิด resource', ifNot: 'หยุดที่ resource ตัวแรกที่ไม่พร้อม → เปิด Status reason / Events ก่อน ห้ามรีบ delete แล้วสร้างใหม่' },
-      { where: 'EC2 Status checks / Target health / CloudFormation Events', check: 'Health และเหตุผลล่าสุด', expect: 'ผ่าน health check และไม่มี failed event หรือ recreate loop', ifNot: 'เจอ layer ที่พังแล้ว → ใช้ reason ที่แสดงเป็นหลักฐาน แล้วไปตรวจ runtime หรือ config ของตัวนั้น' },
-      { where: 'Dependencies เช่น RDS, NAT, ALB, EFS, CloudFront', check: 'resource ที่ถูกเรียกต่อพร้อมก่อน resource ปลายทาง', expect: 'dependency ทุกตัวพร้อม และ endpoint / mount target / deployment ถูกสร้างครบ', ifNot: 'แก้หรือรอ dependency ตัวแรกที่ยังไม่พร้อม ไม่ต้องแก้ปลายทาง' },
-      { where: 'หลัง Create / Update / Register target', check: 'เวลารอ propagation และ grace period', expect: 'รอครบตาม service แล้ว refresh จน status หยุดเปลี่ยน', ifNot: 'ยังสรุปว่า config ผิดไม่ได้ → จดเวลาเริ่ม รอให้ครบ แล้วทดสอบเดิมอีกครั้ง' }
-    ]
-  },
-  {
-    phase: 'flow',
-    icon: '🔗',
-    title: 'ด่าน 4 — ไล่สายทีละช่วง (FLOW / WIRING)',
-    when: 'ห้ามมองทั้งระบบพร้อมกัน ให้หา “ช่วงแรกที่ขาด” จากต้นทางไปปลายทาง',
-    checks: [
-      { where: 'กระดาษ / Spec architecture', check: 'เขียน flow เป็นลูกศรจากจุดทดสอบถึงปลายทาง', expect: 'ได้เส้นทางชัด เช่น Browser → ALB → Target → DB หรือ S3 → SNS → SQS → Lambda', ifNot: 'กลับไปดู Spec แล้วเขียนชื่อ resource จริงลงทุกจุดก่อนตรวจต่อ' },
-      { where: 'ต้นทางของ flow', check: 'ต้นทางสร้าง request / object / message จริง', expect: 'มีหลักฐานที่ต้นทาง เช่น request, S3 object, queue message หรือ command output', ifNot: 'เจอจุดผิดแล้ว → แก้ input, URL, folder, suffix หรือ command ที่ต้นทาง' },
-      { where: 'ทุกลูกศรใน flow จากซ้ายไปขวา', check: 'Source ชี้ Target ถูกตัว พร้อม protocol, port, path และ association', expect: 'listener/route/target/trigger/subscription/origin ชี้ resource ที่ต้องการทุกช่วง', ifNot: 'เจอช่วงที่ขาดแล้ว → แก้เฉพาะลูกศรนั้น แล้วเริ่มไล่ใหม่จากต้นทาง' },
-      { where: 'ก่อนและหลังแต่ละ hop', check: 'ทดสอบแบบใกล้ที่สุด เช่น localhost → private endpoint → public endpoint', expect: 'รู้แน่ว่า hop สุดท้ายที่ผ่านคือจุดไหน และ hop แรกที่ไม่ผ่านคือจุดไหน', ifNot: 'ลดระยะการทดสอบให้สั้นลงจนได้ขอบเขตสองจุดนี้ — ตรงนี้คือ layer ที่ต้องแก้' }
-    ]
-  },
-  {
-    phase: 'access',
-    icon: '🔐',
-    title: 'ด่าน 5 — ทางผ่านและสิทธิ์ (NETWORK / ACCESS)',
-    when: 'ใช้เมื่อ resource พร้อมและชี้หากันถูก แต่ request ไปไม่ถึงหรือถูก AccessDenied',
-    checks: [
-      { where: 'Subnet → Route table → IGW / NAT', check: 'เส้นทาง network ทั้งขาไปและขากลับ', expect: 'subnet associate route table ถูก และ default route ชี้ gateway ที่ถูกชนิด/ตำแหน่ง', ifNot: 'เจอ network edge ที่ขาดแล้ว → แก้ route/association/gateway จุดนั้นก่อน' },
-      { where: 'Security Group / NACL', check: 'Protocol, port และ source/destination', expect: 'เปิด port ที่ service ใช้จาก source ที่ถูก (ควรอ้าง SG เมื่อโจทย์กำหนด)', ifNot: 'แก้ rule ให้ตรง flow ห้ามเปิดทุก port ให้ 0.0.0.0/0 เพื่อกลบอาการ' },
-      { where: 'IAM Role / Identity policy / Resource policy', check: 'Principal, Action, Resource ARN และ trust relationship', expect: 'ตัวที่รันงานมีสิทธิ์ต่อ resource จริง และ ARN/เงื่อนไขตรง resource ปัจจุบัน', ifNot: 'เจอ permission ที่ขาดแล้ว → แก้ policy แคบที่สุด แล้วอ่าน error ใหม่หลัง retry' },
-      { where: 'Event notification / Trigger / Subscription', check: 'การผูก event และ filter', expect: 'source ผูก destination ถูกตัว และ prefix/suffix/event type ตรง input จริง', ifNot: 'เจอ wiring ที่ขาดแล้ว → แก้ binding/filter แล้วสร้าง event ใหม่ เพราะ event เก่าอาจไม่ replay' }
-    ]
-  },
-  {
-    phase: 'runtime',
-    icon: '🧩',
-    title: 'ด่าน 6 — ข้างในรันจริงไหม (CONFIG / RUNTIME)',
-    when: 'ใช้เมื่อ traffic มาถึง resource แล้ว แต่ได้ 4xx/5xx, unhealthy หรือไม่มี output',
-    checks: [
-      { where: 'Instance / Container / Function', check: 'process หรือ service ทำงาน และตอบ local test', expect: 'service active, handler ถูกเรียก และ localhost/health path ตอบตามที่คาด', ifNot: 'เจอ runtime ที่พังแล้ว → เปิด service status และ log ก่อน restart หรือ recreate' },
-      { where: 'CloudWatch Logs / service logs', check: 'error ในช่วง timestamp เดียวกับที่ทดสอบ', expect: 'เจอ request/event ล่าสุด และไม่มี fatal, exception, permission หรือ connection error', ifNot: 'ถ้าไม่มี log เลย ให้ย้อนด่าน FLOW; ถ้ามี error ให้ใช้บรรทัดแรกที่เป็น root cause ไม่ใช่บรรทัด stack trace ท้ายสุด' },
-      { where: 'Environment / Parameters / Settings', check: 'endpoint, database, bucket, queue, path, credentials และ case sensitivity', expect: 'ค่าตรง resource จริง ไม่มี -ro ผิดประเภท, ไม่มี space และชื่อ/path ตรงตัวพิมพ์', ifNot: 'เจอ config ที่ผิดแล้ว → แก้ค่าเดียว deploy/save แล้วทดสอบ input เดิม' },
-      { where: 'User data / Script / Lambda runtime settings', check: 'entry point, handler, interpreter และ syntax', expect: 'บรรทัดแรก/handler ถูกต้อง ไฟล์ executable และ script จบโดยไม่มี error', ifNot: 'รันหรืออ่าน log ของ script ทีละคำสั่ง แก้คำสั่งแรกที่ fail ก่อนส่วนที่เหลือ' }
-    ]
-  },
-  {
-    phase: 'prove',
-    icon: '✅',
-    title: 'ด่าน 7 — พิสูจน์ว่าเจอตัวจริง (FIX / VERIFY)',
-    when: 'ปิดงานด้วยหลักฐาน ไม่ใช่แก้หลายอย่างแล้วบังเอิญใช้ได้',
-    checks: [
-      { where: 'จุด ❌ แรกที่พบจากด่านก่อนหน้า', check: 'ตั้งสมมติฐานหนึ่งข้อจากหลักฐาน', expect: 'ประโยคแบบ “request หยุดที่ X เพราะ Y ไม่ตรง” และระบุค่าที่จะแก้เพียงจุดเดียว', ifNot: 'ถ้ายังบอก X และ Y ไม่ได้ ให้ย้อนด่านแรกที่ตอบ ✅ ไม่ได้' },
-      { where: 'Resource ที่เป็นต้นเหตุ', check: 'เปลี่ยนครั้งละหนึ่งค่าและจดค่าก่อนแก้', expect: 'รู้ว่าเปลี่ยนอะไร สามารถย้อนกลับได้ และไม่แตะ layer อื่นพร้อมกัน', ifNot: 'ยกเลิกการแก้หลายจุด แล้วกลับสู่ค่าก่อนหน้าเพื่อทดสอบใหม่อย่างควบคุมได้' },
-      { where: 'จุดทดสอบเดิมจากด่าน 1', check: 'ทดสอบซ้ำด้วย input เดิมหลัง status พร้อม', expect: 'อาการเดิมหาย, flow ผ่านทุก hop และผลลัพธ์ตรง Expected', ifNot: 'เก็บ error/timestamp รอบใหม่ จุด ❌ อาจเลื่อนไป hop ถัดไป → เริ่มไล่จาก READY อีกครั้ง' },
-      { where: 'แท็บ Troubleshoot ของ Lab นี้', check: 'เทียบ layer และอาการที่หาเจอกับ checklist เฉพาะ lab', expect: 'ได้วิธีแก้เฉพาะ service หรือมี evidence ครบสำหรับถามผู้สอน: error, เวลา, failing hop, log และสิ่งที่ลองแล้ว', ifNot: 'อย่าส่งแค่ “ทำไม่ได้” — แนบ evidence ทั้งห้ารายการเพื่อให้วิเคราะห์ต่อได้ทันที' }
-    ]
-  }
-];
+const debugChecklistData = {
+  lab1: [
+    {
+      title: 'Console / Command Host',
+      items: [
+        { check: 'Region', mustBe: '{LabRegion}' },
+        { check: 'EC2 Instance', mustBe: 'Command Host' },
+        { check: 'Instance state', mustBe: 'Running' },
+        { check: 'Connection', mustBe: 'SSM Session Manager' }
+      ]
+    },
+    {
+      title: 'S3 Console',
+      items: [
+        { check: 'Bucket name', mustBe: 'labbucket-{NUMBER}' },
+        { check: 'Bucket Region', mustBe: '{LabRegion}' },
+        { check: 'Settings อื่น', mustBe: 'Default ทั้งหมด' },
+        { check: 'Object', mustBe: 'HappyFace.jpg' }
+      ]
+    },
+    {
+      title: 'S3 CLI',
+      items: [
+        { check: 'Bucket name', mustBe: 'labclibucket-{NUMBER}' },
+        { check: 'Source file', mustBe: '/home/ssm-user/HappyFace.jpg' },
+        { check: 'Create command', mustBe: 'aws s3 mb s3://labclibucket-{NUMBER}' },
+        { check: 'Upload command', mustBe: 'aws s3 cp /home/ssm-user/HappyFace.jpg s3://labclibucket-{NUMBER}' }
+      ]
+    }
+  ],
+
+  lab2: [
+    {
+      title: 'VPC / Subnets',
+      items: [
+        { check: 'Region', mustBe: 'us-west-2 (Oregon)' },
+        { check: 'Lab VPC CIDR', mustBe: '10.0.0.0/16' },
+        { check: 'Lab VPC DNS hostnames', mustBe: 'Enabled' },
+        { check: 'Public Subnet CIDR', mustBe: '10.0.0.0/24' },
+        { check: 'Public Subnet Public IPv4', mustBe: 'Enabled' },
+        { check: 'Private Subnet CIDR', mustBe: '10.0.2.0/23' },
+        { check: 'Private Subnet AZ', mustBe: 'AZ เดียวกับ Public Subnet' }
+      ]
+    },
+    {
+      title: 'Gateway / Routes',
+      items: [
+        { check: 'Lab IGW', mustBe: 'Attached → Lab VPC' },
+        { check: 'Public Route Table route', mustBe: '0.0.0.0/0 → Lab IGW' },
+        { check: 'Public Route Table association', mustBe: 'Public Subnet' },
+        { check: 'Lab NGW subnet', mustBe: 'Public Subnet' },
+        { check: 'Lab NGW state', mustBe: 'Available' },
+        { check: 'Private Route Table route', mustBe: '0.0.0.0/0 → Lab NGW' },
+        { check: 'Private Route Table association', mustBe: 'Private Subnet' }
+      ]
+    },
+    {
+      title: 'Security Groups',
+      items: [
+        { check: 'Public SG / VPC', mustBe: 'Lab VPC' },
+        { check: 'Public SG / Inbound', mustBe: 'HTTP TCP 80 ← 0.0.0.0/0' },
+        { check: 'Private SG / VPC', mustBe: 'Lab VPC' },
+        { check: 'Private SG / Inbound', mustBe: 'HTTP TCP 80 ← Public SG' }
+      ]
+    },
+    {
+      title: 'Public Instance',
+      items: [
+        { check: 'Name', mustBe: 'Public Instance' },
+        { check: 'AMI / Type', mustBe: 'Amazon Linux 2023 / t3.micro' },
+        { check: 'VPC / Subnet', mustBe: 'Lab VPC / Public Subnet' },
+        { check: 'Public IP', mustBe: 'Enable' },
+        { check: 'Security group', mustBe: 'Public SG' },
+        { check: 'IAM profile', mustBe: 'EC2InstProfile' }
+      ]
+    },
+    {
+      title: 'Private Instance',
+      items: [
+        { check: 'Name', mustBe: 'Private Instance' },
+        { check: 'AMI / Type', mustBe: 'Amazon Linux 2023 / t3.micro' },
+        { check: 'VPC / Subnet', mustBe: 'Lab VPC / Private Subnet' },
+        { check: 'Public IP', mustBe: 'Disable' },
+        { check: 'Security group', mustBe: 'Private SG' },
+        { check: 'IAM profile', mustBe: 'EC2InstProfile' }
+      ]
+    },
+    {
+      title: 'Result',
+      items: [
+        { check: 'Public web URL', mustBe: 'http://{PublicIPv4DNS}' },
+        { check: 'EC2 status checks', mustBe: 'All checks passed' },
+        { check: 'Private curl', mustBe: 'HTTP/2 200' }
+      ]
+    }
+  ],
+
+  lab3: [
+    {
+      title: 'Aurora',
+      items: [
+        { check: 'Region', mustBe: 'us-west-2' },
+        { check: 'Engine', mustBe: 'Aurora MySQL Compatible' },
+        { check: 'Template / Scalability', mustBe: 'Dev/Test / Provisioned' },
+        { check: 'Cluster identifier', mustBe: 'aurora' },
+        { check: 'Instance class', mustBe: 'db.t3.medium' },
+        { check: 'Master username', mustBe: 'dbadmin' },
+        { check: 'Master password', mustBe: '{LabPassword}' },
+        { check: 'Initial database', mustBe: 'inventory' },
+        { check: 'Status', mustBe: 'Available' }
+      ]
+    },
+    {
+      title: 'Aurora Network',
+      items: [
+        { check: 'VPC', mustBe: 'LabVPC' },
+        { check: 'DB subnet group', mustBe: 'labdbsubnetgroup' },
+        { check: 'Public access', mustBe: 'No' },
+        { check: 'Security group', mustBe: 'LabDBSecurityGroup เท่านั้น' },
+        { check: 'DB SG / Inbound', mustBe: 'MySQL TCP 3306 ← App server SG' },
+        { check: 'Enhanced monitoring', mustBe: 'Off' },
+        { check: 'Auto minor upgrade', mustBe: 'Off' }
+      ]
+    },
+    {
+      title: 'Target Group / ALB',
+      items: [
+        { check: 'Target group', mustBe: 'ALBTargetGroup' },
+        { check: 'Registered targets', mustBe: 'AppServer1 + AppServer2' },
+        { check: 'Health check path', mustBe: '/' },
+        { check: 'Target health', mustBe: 'healthy ทั้ง 2 targets' },
+        { check: 'ALB name', mustBe: 'LabAppALB' },
+        { check: 'ALB subnets', mustBe: 'PublicSubnet1 + PublicSubnet2' },
+        { check: 'ALB security group', mustBe: 'LabALBSecurityGroup เท่านั้น' },
+        { check: 'Listener', mustBe: 'HTTP:80 → ALBTargetGroup' }
+      ]
+    },
+    {
+      title: 'Application Settings',
+      items: [
+        { check: 'URL', mustBe: 'http://{LabAppALBDnsName}' },
+        { check: 'Endpoint', mustBe: '{WriterEndpoint} (ไม่มี -ro)' },
+        { check: 'Database', mustBe: 'inventory' },
+        { check: 'Username', mustBe: 'dbadmin' },
+        { check: 'Password', mustBe: '{LabPassword}' }
+      ]
+    }
+  ],
+
+  lab4: [
+    {
+      title: 'Security Chain',
+      items: [
+        { check: 'Inventory-ALB / Inbound', mustBe: 'HTTP TCP 80 ← 0.0.0.0/0' },
+        { check: 'Inventory-App / Inbound', mustBe: 'HTTP TCP 80 ← Inventory-ALB' },
+        { check: 'Inventory-DB / Inbound', mustBe: 'MySQL TCP 3306 ← Inventory-App' }
+      ]
+    },
+    {
+      title: 'Launch Template',
+      items: [
+        { check: 'Name', mustBe: 'Lab-launch-template' },
+        { check: 'AMI / Type', mustBe: 'Amazon Linux 2023 / t3.micro' },
+        { check: 'Security group', mustBe: 'Inventory-App' },
+        { check: 'IAM profile', mustBe: 'Inventory-App-Role' },
+        { check: 'User data บรรทัดแรก', mustBe: '#!/bin/bash' }
+      ]
+    },
+    {
+      title: 'Auto Scaling Group',
+      items: [
+        { check: 'Name', mustBe: 'Inventory-ASG' },
+        { check: 'VPC', mustBe: 'Lab VPC' },
+        { check: 'Subnets', mustBe: 'Private Subnet 1 + Private Subnet 2' },
+        { check: 'Target group', mustBe: 'Inventory-App | HTTP' },
+        { check: 'Grace period', mustBe: '300 seconds' },
+        { check: 'Desired / Min / Max', mustBe: '2 / 2 / 2' },
+        { check: 'Tag', mustBe: 'Name = Inventory-App' },
+        { check: 'Instances', mustBe: '2 × InService' }
+      ]
+    },
+    {
+      title: 'Target / Runtime',
+      items: [
+        { check: 'Original AppServer', mustBe: 'Deregistered' },
+        { check: 'ASG target health', mustBe: '2 × healthy' },
+        { check: 'Health check', mustBe: 'HTTP / traffic port / path /' },
+        { check: 'httpd', mustBe: 'active (running)' },
+        { check: 'curl localhost', mustBe: 'HTML response' }
+      ]
+    },
+    {
+      title: 'Aurora / NAT HA',
+      items: [
+        { check: 'Reader identifier', mustBe: 'inventory-replica' },
+        { check: 'Reader AZ', mustBe: 'ต่างจาก inventory-primary' },
+        { check: 'Second NAT name', mustBe: 'my-nat-gateway' },
+        { check: 'Second NAT subnet', mustBe: 'Public Subnet 2' },
+        { check: 'Private Route Table 2 route', mustBe: '0.0.0.0/0 → my-nat-gateway' },
+        { check: 'Route Table association', mustBe: 'Private Subnet 2' }
+      ]
+    }
+  ],
+
+  lab5: [
+    {
+      title: 'SNS / SQS',
+      items: [
+        { check: 'Region', mustBe: 'us-east-2 (Ohio)' },
+        { check: 'SNS type', mustBe: 'Standard' },
+        { check: 'SNS name', mustBe: 'resize-image-topic-{UNIQUE_SUFFIX}' },
+        { check: 'thumbnail queue', mustBe: 'thumbnail-queue / Standard' },
+        { check: 'mobile queue', mustBe: 'mobile-queue / Standard' },
+        { check: 'ทั้ง 2 queues subscribe', mustBe: '{ResizeImageTopicArn}' }
+      ]
+    },
+    {
+      title: 'SNS Policy / S3 Event',
+      items: [
+        { check: 'SNS Principal', mustBe: 's3.amazonaws.com' },
+        { check: 'SNS_TOPIC_OWNER', mustBe: '{ACCOUNT_ID} ครบทุกจุด' },
+        { check: 'SNS_TOPIC_ARN', mustBe: '{ResizeImageTopicArn} ครบทุกจุด' },
+        { check: 'Event name', mustBe: 'resize-image-event' },
+        { check: 'Event type', mustBe: 's3:ObjectCreated:*' },
+        { check: 'Prefix', mustBe: 'ingest/' },
+        { check: 'Suffix', mustBe: '.jpg' },
+        { check: 'Destination', mustBe: '{ResizeImageTopicName}' }
+      ]
+    },
+    {
+      title: 'CreateThumbnail',
+      items: [
+        { check: 'Runtime', mustBe: 'Python 3.12' },
+        { check: 'Role', mustBe: '{LabExecutionRole}' },
+        { check: 'Code', mustBe: '{CreateThumbnailZIPLocation}' },
+        { check: 'Handler', mustBe: 'CreateThumbnail.handler' },
+        { check: 'Trigger', mustBe: 'thumbnail-queue' },
+        { check: 'Batch / Timeout / Memory', mustBe: '1 / 60 sec / 256 MB' },
+        { check: 'Environment', mustBe: 'bucket_name = {LabBucketName}' }
+      ]
+    },
+    {
+      title: 'CreateMobileImage',
+      items: [
+        { check: 'Runtime', mustBe: 'Python 3.12' },
+        { check: 'Role', mustBe: '{LabExecutionRole}' },
+        { check: 'Code', mustBe: '{CreateMobileImageZIPLocation}' },
+        { check: 'Handler', mustBe: 'CreateMobileImage.handler' },
+        { check: 'Trigger', mustBe: 'mobile-queue' },
+        { check: 'Batch / Timeout / Memory', mustBe: '1 / 60 sec / 256 MB' },
+        { check: 'Environment', mustBe: 'bucket_name = {LabBucketName}' }
+      ]
+    },
+    {
+      title: 'Result',
+      items: [
+        { check: 'Input', mustBe: 'ingest/{FILENAME}.jpg' },
+        { check: 'Thumbnail output', mustBe: 'thumbnail/{FILENAME}.jpg' },
+        { check: 'Mobile output', mustBe: 'mobile/{FILENAME}.jpg' },
+        { check: 'CloudWatch', mustBe: 'ทั้ง 2 Functions มี log stream ล่าสุด' }
+      ]
+    }
+  ],
+
+  lab6: [
+    {
+      title: 'CloudFront เดิม',
+      items: [
+        { check: 'Region', mustBe: 'us-west-2' },
+        { check: 'Distribution', mustBe: 'Distribution ที่ Lab สร้างไว้' },
+        { check: 'Status', mustBe: 'Enabled / ไม่ใช่ Deploying' },
+        { check: 'Domain', mustBe: '{CloudFrontDomain}' }
+      ]
+    },
+    {
+      title: 'S3 / Bucket Policy',
+      items: [
+        { check: 'Bucket name', mustBe: '{LabBucketName}' },
+        { check: 'Object key', mustBe: 'CachedObjects/logo.png' },
+        { check: 'Block all public access', mustBe: 'On หลังตั้ง OAC' },
+        { check: 'Policy Principal', mustBe: 'cloudfront.amazonaws.com' },
+        { check: 'Policy Resource', mustBe: 'arn:aws:s3:::{LabBucketName}/*' },
+        { check: 'Policy AWS:SourceArn', mustBe: '{CloudFrontDistributionArn}' },
+        { check: 'Policy placeholders', mustBe: 'เหลือ 0 จุด' }
+      ]
+    },
+    {
+      title: 'S3 Origin / OAC',
+      items: [
+        { check: 'Origin domain', mustBe: '{LabBucketName}' },
+        { check: 'Origin path', mustBe: 'ว่าง' },
+        { check: 'Origin name', mustBe: 'My Amazon S3 Origin' },
+        { check: 'Origin access', mustBe: 'Origin access control settings' },
+        { check: 'OAC', mustBe: 'Created / Selected' }
+      ]
+    },
+    {
+      title: 'Behavior / Result',
+      items: [
+        { check: 'Path pattern', mustBe: 'CachedObjects/*.png' },
+        { check: 'Origin', mustBe: 'My Amazon S3 Origin' },
+        { check: 'Cache policy', mustBe: 'CachingOptimized' },
+        { check: 'Direct S3 URL', mustBe: '403 AccessDenied' },
+        { check: 'CloudFront URL', mustBe: 'https://{CloudFrontDomain}/CachedObjects/logo.png' }
+      ]
+    }
+  ],
+
+  lab7: [
+    {
+      title: 'VPC Stack / Aurora',
+      items: [
+        { check: 'VPC Stack name', mustBe: 'VPCStack' },
+        { check: 'VPC Stack status', mustBe: 'CREATE_COMPLETE' },
+        { check: 'DB subnet group', mustBe: 'AuroraSubnetGroup / LabVPC' },
+        { check: 'DB subnets', mustBe: '10.0.4.0/24 + 10.0.5.0/24' },
+        { check: 'Cluster identifier', mustBe: 'MyDBCluster' },
+        { check: 'Username / Password', mustBe: 'admin / {LabPassword}' },
+        { check: 'Instance class', mustBe: 'db.t3.medium' },
+        { check: 'Public access', mustBe: 'No' },
+        { check: 'Security group', mustBe: 'RDSSecurityGroup เท่านั้น' },
+        { check: 'Initial DB', mustBe: 'WPDatabase' },
+        { check: 'Status', mustBe: 'Available' }
+      ]
+    },
+    {
+      title: 'EFS',
+      items: [
+        { check: 'Name', mustBe: 'myWPEFS' },
+        { check: 'Backups / Encryption', mustBe: 'Off / Off' },
+        { check: 'Throughput / Performance', mustBe: 'Bursting / General Purpose' },
+        { check: 'VPC', mustBe: 'LabVPC' },
+        { check: 'Mount target 1', mustBe: 'AppSubnet1 / EFSMountTargetSecurityGroup' },
+        { check: 'Mount target 2', mustBe: 'AppSubnet2 / EFSMountTargetSecurityGroup' },
+        { check: 'File system ID', mustBe: '{EfsId}' }
+      ]
+    },
+    {
+      title: 'Target Group / ALB',
+      items: [
+        { check: 'Target group', mustBe: 'myWPTargetGroup / Instances / LabVPC' },
+        { check: 'Protocol / Port', mustBe: 'HTTP / 80' },
+        { check: 'Health path', mustBe: '/wp-login.php' },
+        { check: 'Threshold', mustBe: 'Healthy 2 / Unhealthy 10' },
+        { check: 'Timeout / Interval', mustBe: '50 / 60 seconds' },
+        { check: 'ALB', mustBe: 'myWPAppALB / LabVPC' },
+        { check: 'ALB subnets', mustBe: 'PublicSubnet1 + PublicSubnet2' },
+        { check: 'ALB security group', mustBe: 'AppInstanceSecurityGroup เท่านั้น' },
+        { check: 'Listener', mustBe: 'HTTP:80 → myWPTargetGroup' }
+      ]
+    },
+    {
+      title: 'WPLaunchConfigStack',
+      items: [
+        { check: 'Stack status', mustBe: 'CREATE_COMPLETE' },
+        { check: 'DB Name', mustBe: 'WPDatabase' },
+        { check: 'DB endpoint', mustBe: '{WriterEndpoint} (ไม่มี -ro)' },
+        { check: 'DB User / Password', mustBe: 'admin / {LabPassword}' },
+        { check: 'WP User / Password', mustBe: 'wpadmin / {LabPassword}' },
+        { check: 'Instance type', mustBe: 't3.medium' },
+        { check: 'ALBDnsName', mustBe: '{AlbDnsName} (ไม่มี http:// และ /)' },
+        { check: 'EFS ID', mustBe: '{EfsId}' }
+      ]
+    },
+    {
+      title: 'Auto Scaling Group',
+      items: [
+        { check: 'Name', mustBe: 'WP-ASG' },
+        { check: 'VPC / Subnets', mustBe: 'LabVPC / AppSubnet1 + AppSubnet2' },
+        { check: 'Target group', mustBe: 'myWPTargetGroup | HTTP' },
+        { check: 'ELB health checks', mustBe: 'On' },
+        { check: 'Grace period', mustBe: '300 seconds หรือมากกว่า' },
+        { check: 'Desired / Min / Max', mustBe: '2 / 2 / 4' },
+        { check: 'Tag', mustBe: 'Name = WP-App' },
+        { check: 'Instances', mustBe: '2 × InService' }
+      ]
+    },
+    {
+      title: 'Result',
+      items: [
+        { check: 'Target health', mustBe: 'healthy ทั้ง 2 targets' },
+        { check: 'URL', mustBe: 'http://{AlbDnsName}/wp-login.php' },
+        { check: 'Login', mustBe: 'wpadmin / {LabPassword}' }
+      ]
+    }
+  ]
+};

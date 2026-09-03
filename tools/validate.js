@@ -96,11 +96,13 @@ function collectRefs(text) {
 
 const specsHTML = readGlobal('specsHTML');
 const troubleshootData = readGlobal('troubleshootData');
-const universalDebugData = readGlobal('universalDebugData');
+const debugChecklistData = readGlobal('debugChecklistData');
 
 if (!specsHTML || typeof specsHTML !== 'object') addError('specs.js: ไม่มี specsHTML object');
 if (!troubleshootData || typeof troubleshootData !== 'object') addError('troubleshoot.js: ไม่มี troubleshootData object');
-if (!Array.isArray(universalDebugData)) addError('debug.js: ไม่มี universalDebugData array');
+if (!debugChecklistData || typeof debugChecklistData !== 'object' || Array.isArray(debugChecklistData)) {
+  addError('debug.js: ไม่มี debugChecklistData object');
+}
 
 let totalSteps = 0;
 let totalErrors = 0;
@@ -228,34 +230,52 @@ for (const [key, list] of Object.entries(troubleshootData || {})) {
   });
 }
 
-/* ---------- validate universal DEBUG checklist ---------- */
+/* ---------- validate exact DEBUG configuration ---------- */
 
-if (Array.isArray(universalDebugData)) {
-  if (universalDebugData.length === 0) addError('universalDebugData: ต้องมีอย่างน้อย 1 phase');
-  universalDebugData.forEach((phase, i) => {
-    const label = `universalDebugData[${i}]`;
-    if (!phase || typeof phase !== 'object') {
-      addError(`${label}: ไม่ใช่ object`);
-      return;
+if (debugChecklistData && typeof debugChecklistData === 'object' && !Array.isArray(debugChecklistData)) {
+  for (const key of Object.keys(debugChecklistData)) {
+    if (!LAB_KEYS.includes(key)) addError(`debugChecklistData: ไม่รู้จัก key "${key}"`);
+  }
+
+  for (const key of LAB_KEYS) {
+    const groups = debugChecklistData[key];
+    if (!Array.isArray(groups)) {
+      addError(`debugChecklistData.${key}: ต้องเป็น array`);
+      continue;
     }
-    for (const field of ['phase', 'icon', 'title', 'when']) {
-      if (!phase[field]) addError(`${label}: ไม่มี "${field}"`);
+    if (groups.length < 3 || groups.length > 8) {
+      addError(`debugChecklistData.${key}: ต้องมี 3-8 groups (ได้ ${groups.length})`);
     }
-    if (!Array.isArray(phase.checks)) {
-      addError(`${label}: checks ต้องเป็น array`);
-      return;
-    }
-    if (phase.checks.length === 0) addError(`${label}: checks ว่าง`);
-    phase.checks.forEach((check, j) => {
-      if (!check || typeof check !== 'object') {
-        addError(`${label}.checks[${j}]: ไม่ใช่ object`);
+
+    groups.forEach((group, i) => {
+      const label = `debugChecklistData.${key}[${i}]`;
+      if (!group || typeof group !== 'object') {
+        addError(`${label}: ไม่ใช่ object`);
         return;
       }
-      for (const field of ['where', 'check', 'expect', 'ifNot']) {
-        if (!check[field]) addError(`${label}.checks[${j}]: ไม่มี "${field}"`);
+      if (!group.title) addError(`${label}: ไม่มี "title"`);
+      if (!Array.isArray(group.items) || group.items.length === 0) {
+        addError(`${label}: items ต้องเป็น non-empty array`);
+        return;
       }
+
+      group.items.forEach((item, j) => {
+        const itemLabel = `${label}.items[${j}]`;
+        if (!item || typeof item !== 'object') {
+          addError(`${itemLabel}: ไม่ใช่ object`);
+          return;
+        }
+        for (const field of ['check', 'mustBe']) {
+          if (typeof item[field] !== 'string' || item[field].trim() === '') {
+            addError(`${itemLabel}: ไม่มี "${field}"`);
+          }
+        }
+        for (const legacy of ['phase', 'icon', 'when', 'expect', 'ifNot', 'cause', 'fix']) {
+          if (legacy in item) addError(`${itemLabel}: ห้ามใช้ legacy field "${legacy}"`);
+        }
+      });
     });
-  });
+  }
 }
 
 /* ---------- report ---------- */

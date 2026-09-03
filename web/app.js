@@ -120,9 +120,10 @@ function getTroubleshootData(key) {
   }
 }
 
-function getDebugData() {
+function getDebugData(key) {
   try {
-    return Array.isArray(universalDebugData) ? universalDebugData : [];
+    const groups = debugChecklistData[key];
+    return Array.isArray(groups) ? groups : [];
   } catch (err) {
     logIssue('error', `debug.js โหลดไม่สำเร็จ — ${err.message}`);
     return [];
@@ -614,14 +615,6 @@ function renderTroubleshoot(key) {
    UNIVERSAL DEBUG
    ========================================================= */
 
-function toggleChecklist(header) {
-  if (!header) return;
-  const issue = header.closest('.ts-issue');
-  if (!issue) return;
-  const isOpen = issue.classList.toggle('open');
-  header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-}
-
 function renderDebug(key) {
   const container = document.getElementById('tab-debug');
   if (!container) {
@@ -629,53 +622,38 @@ function renderDebug(key) {
     return;
   }
 
-  const data = getDebugData();
-  if (data.length === 0) {
-    container.innerHTML = '<p class="empty-note">โหลด universal DEBUG checklist ไม่สำเร็จ</p>';
+  const groups = getDebugData(key);
+  if (groups.length === 0) {
+    container.innerHTML = '<p class="empty-note">ยังไม่มี config checklist สำหรับ lab นี้</p>';
     return;
   }
 
-  const phases = data.map((phase, index) => {
-    if (!phase || typeof phase !== 'object') {
-      logIssue('warn', `debug phase[${index}] ไม่ใช่ object`);
+  const groupHTML = groups.map((group, groupIndex) => {
+    if (!group || typeof group !== 'object') {
+      logIssue('warn', `${key}: debug group[${groupIndex}] ไม่ใช่ object`);
       return '';
     }
-    ['phase', 'icon', 'title', 'when', 'checks'].forEach(field => {
-      if (!phase[field]) logIssue('warn', `debug phase[${index}] ไม่มี "${field}"`);
-    });
 
-    const checks = Array.isArray(phase.checks) ? phase.checks.filter(Boolean) : [];
-    const phaseName = String(phase.phase || '').replace(/[^a-z0-9_-]/gi, '');
-    const isOpen = index === 0;
-
-    return `<div class="ts-issue debug-phase phase-${phaseName}${isOpen ? ' open' : ''}">
-      <button class="ts-header" type="button" onclick="toggleChecklist(this)"
-          aria-expanded="${isOpen ? 'true' : 'false'}">
-        <span class="ts-title" data-icon="${escapeHtml(phase.icon)}">${escapeHtml(phase.title)}</span>
-        <span class="ts-arrow">▼</span>
-      </button>
-      <div class="ts-body">
-        <div class="ts-when">${escapeHtml(phase.when)}</div>
-        <div class="ts-checks">
-          ${checks.map((check, checkIndex) => `<div class="ts-check">
-            <div class="ts-check-num">${checkIndex + 1}</div>
-            <div class="ts-check-content">
-              <div class="ts-where">${escapeHtml(check.where)}</div>
-              <div class="ts-what">เช็ค: <strong>${escapeHtml(check.check)}</strong></div>
-              <div class="ts-expect">✅ ต้องเป็น: ${escapeHtml(check.expect)}</div>
-              <div class="ts-ifnot">❌ ถ้าไม่ตรง: ${formatText(check.ifNot)}</div>
-            </div>
-          </div>`).join('')}
+    const items = Array.isArray(group.items) ? group.items.filter(Boolean) : [];
+    return `<section class="debug-group">
+      <h4 class="debug-group-title">${escapeHtml(group.title)}</h4>
+      <div class="debug-table">
+        <div class="debug-row debug-table-head" aria-hidden="true">
+          <span>จุดที่เช็ค</span>
+          <span>ต้องเป็น</span>
         </div>
+        ${items.map(item => `<div class="debug-row">
+          <span class="debug-check">${escapeHtml(item.check)}</span>
+          <strong class="debug-must">${escapeHtml(item.mustBe)}</strong>
+        </div>`).join('')}
       </div>
-    </div>`;
+    </section>`;
   }).join('');
 
-  container.innerHTML = `<div class="debug-intro">
-    <h3>DEBUG ครอบจักรวาล — ${escapeHtml(LAB_META[key].title)}</h3>
-    <p>ไล่จากด่าน 1 ไป 7 ตามลำดับและตอบจากหลักฐานจริง หากทำครบ อย่างน้อยจะรู้ว่า error อยู่ที่ layer ไหน แม้ยังไม่รู้วิธีแก้ทันที</p>
-    <span class="debug-rule">กติกา: เจอ ❌ ข้อแรก ให้หยุดและแก้ตรงนั้นก่อน</span>
-  </div>${phases}`;
+  container.innerHTML = `<div class="debug-heading">
+    <h3>Config ที่ต้องตรง</h3>
+    <span>${escapeHtml(LAB_META[key].title)}</span>
+  </div>${groupHTML}`;
 }
 
 /* =========================================================
